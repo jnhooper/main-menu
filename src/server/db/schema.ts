@@ -39,6 +39,48 @@ export const posts = createTable(
   })
 );
 
+export const households = createTable('household', {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: varchar("name", { length: 255 }).notNull(),
+  headOfHouseholdId: varchar('head_of_household_id').notNull()
+})
+
+export const householdsRelations = relations(households,({one, many}) =>({
+  headOfHousehold: one(users, {
+    fields: [ households.headOfHouseholdId ],
+    references: [users.id],
+    relationName: 'head_of_household'
+  }),
+  users: many(usersToHouseholds)
+}))
+
+export const usersToHouseholds = createTable('users_to_households', {
+  userId:varchar("user_id", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+ householdId: varchar("household_id", { length: 255 })
+      .notNull()
+      .references(() => households.id),
+  },
+  (t) => ( {
+    primaryKey: primaryKey({ columns:[ t.userId, t.householdId ] }),
+  }),
+)
+
+export const usersToHouseholdsRelations = relations(usersToHouseholds, ({one})=>({
+  household: one(households, {
+    fields: [ usersToHouseholds.householdId ],
+    references: [households.id],
+  }),
+  user: one(users, {
+    fields: [ usersToHouseholds.userId ],
+    references: [users.id],
+  })
+}))
+
 export const users = createTable("user", {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -55,7 +97,11 @@ export const users = createTable("user", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  headOfHouseholds: many(households, {relationName: 'head_of_household'}),
+  households: many(usersToHouseholds)
 }));
+
+
 
 export const accounts = createTable(
   "account",
