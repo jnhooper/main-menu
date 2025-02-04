@@ -11,22 +11,25 @@
 
 DB_CONTAINER_NAME="jnHooperMenu"
 
-if ! [ -x "$(command -v docker)" ]; then
+# using podman for open source docker alternative
+# feel free to switch podman to docker
+
+if ! [ -x "$(command -v podman)" ]; then
   echo -e "Docker is not installed. Please install docker and try again.\nDocker install guide: https://docs.docker.com/engine/install/"
   exit 1
 fi
 
-if ! docker info > /dev/null 2>&1; then
+if ! podman info > /dev/null 2>&1; then
   echo "Docker daemon is not running. Please start Docker and try again."
   exit 1
 fi
 
-if [ "$(docker ps -q -f name=$DB_CONTAINER_NAME)" ]; then
+if [ "$(podman ps -q -f name=$DB_CONTAINER_NAME)" ]; then
   echo "Database container '$DB_CONTAINER_NAME' already running"
   exit 0
 fi
 
-if [ "$(docker ps -q -a -f name=$DB_CONTAINER_NAME)" ]; then
+if [ "$(podman ps -q -a -f name=$DB_CONTAINER_NAME)" ]; then
   docker start "$DB_CONTAINER_NAME"
   echo "Existing database container '$DB_CONTAINER_NAME' started"
   exit 0
@@ -51,7 +54,7 @@ if [ "$DB_PASSWORD" = "password" ]; then
   sed -i -e "s#:password@#:$DB_PASSWORD@#" .env
 fi
 
-docker run -d \
+podman run -d \
   --name $DB_CONTAINER_NAME \
   -e POSTGRES_USER="postgres" \
   -e POSTGRES_PASSWORD="$DB_PASSWORD" \
