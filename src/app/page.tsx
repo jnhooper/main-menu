@@ -3,10 +3,14 @@ import Link from "next/link";
 import { LatestPost } from "~/app/_components/post";
 import { auth } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
+import { CreateHousehold } from "./_components/households/CreateHousehold";
 
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
   const session = await auth();
+  const myHouseholds = await api.households.getMyHouseholds()
+  console.log(myHouseholds)
+
 
   if (session?.user) {
     void api.post.getLatest.prefetch();
@@ -61,7 +65,7 @@ export default async function Home() {
             </div>
           </div>
 
-          {session?.user && <LatestPost />}
+          {session?.user && <CreateHousehold initialHouseholds={myHouseholds} />}
         </div>
       </main>
     </HydrateClient>
