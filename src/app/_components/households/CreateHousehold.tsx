@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { api } from "~/trpc/react";
 import { type api as serverApi } from "~/trpc/server";
+import { DeleteHouseholdButton } from "./DeleteHouseholdButton";
 
 interface CreateHouseholdProps {
   initialHouseholds: Awaited<ReturnType<
@@ -36,7 +37,10 @@ export function CreateHousehold(props: CreateHouseholdProps) {
           households:
           <ul>
             {myHouseholds.map(hh => (
-              <li key={hh.household.id}>{hh.household.name}</li>
+              <li key={hh.household.id}>
+                {hh.household.name}
+                <DeleteHouseholdButton id={hh.household.id} />
+              </li>
             ))}
           </ul>
         </div>
