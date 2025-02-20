@@ -39,6 +39,9 @@ export const posts = createTable(
   })
 );
 
+
+
+
 export const households = createTable('household', {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -59,12 +62,19 @@ export const householdsRelations = relations(households,({one, many}) =>({
 
 export const usersToHouseholds = createTable('users_to_households', {
   userId:varchar("user_id", { length: 255 })
-      .notNull()
-      .references(() => users.id),
- householdId: varchar("household_id", { length: 255 })
-      .notNull()
-      .references(() => households.id),
+  .notNull()
+  .references(() => {
+    return users.id
   },
+    {onDelete: 'cascade'}
+  ),
+  householdId: varchar("household_id", { length: 255 })
+  .notNull()
+  .references(
+    () => households.id,
+    {onDelete: 'cascade'}
+  ),
+},
   (t) => ( {
     primaryKey: primaryKey({ columns:[ t.userId, t.householdId ] }),
   }),

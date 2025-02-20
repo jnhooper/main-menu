@@ -1,4 +1,5 @@
 
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {eq} from 'drizzle-orm'
@@ -50,15 +51,29 @@ export const householdsRouter = createTRPCRouter({
 
   }),
 
-  getLatest: protectedProcedure.query(async ({ ctx }) => {
-    const post = await ctx.db.query.posts.findFirst({
-      orderBy: (posts, { desc }) => [desc(posts.createdAt)],
-    });
+  delete: protectedProcedure.input(z.object({id: z.string()}))
+  .mutation(async ({ctx, input})=> {
+    if(ctx.session.user){
+      const household = await ctx.db.query.households.findFirst({
+        where:eq(households.id, input.id) 
+      })
+      if(household?.headOfHouseholdId !== ctx.session.user.id){
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+      else {
+        //await ctx.db.delete(usersToHouseholds).where(eq(
+        //  households.id,
+        //  input.id
+        //))
+        await ctx.db.delete(households).where(
+          eq(households.id, input.id)
+        )
+      }
+      return household
+    }
 
-    return post ?? null;
-  }),
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  )
 
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
-  }),
 });
