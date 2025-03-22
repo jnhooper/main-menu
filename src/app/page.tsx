@@ -8,7 +8,7 @@ import { CreateHousehold } from "./_components/households/CreateHousehold";
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
   const session = await auth();
-  const myHouseholds = await api.households.getMyHouseholds()
+  const myHouseholds = session?.user ? await api.households.getMyHouseholds(): []
   console.log(myHouseholds)
 
 
@@ -65,7 +65,9 @@ export default async function Home() {
             </div>
           </div>
 
-          {session?.user && <CreateHousehold initialHouseholds={myHouseholds} />}
+          {session?.user && <CreateHousehold
+            initialHouseholds={myHouseholds}
+          />}
         </div>
       </main>
     </HydrateClient>
