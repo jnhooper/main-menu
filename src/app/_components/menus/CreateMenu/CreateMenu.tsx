@@ -2,15 +2,19 @@
 import { useState } from "react";
 
 import { api } from "~/trpc/react";
+import type {SelectHousehold} from '~/server/db/schema'
 
-export function CreateHousehold() {
+interface CreateMenuProps {
+  householdId: SelectHousehold['id']
+};
 
+export function CreateMenu(props: CreateMenuProps) {
+  const {householdId} = props
   const utils = api.useUtils();
   const [name, setName] = useState("");
-  const createHousehold = api.households.create.useMutation({
+  const createMenu = api.menu.create.useMutation({
     onSuccess: async () => {
-      //await utils.post.invalidate();
-      await utils.households.getMyHouseholds.invalidate()
+      await utils.menu.getHouseholdMenus.invalidate({householdId});
       setName("");
     },
   });
@@ -20,13 +24,13 @@ export function CreateHousehold() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          createHousehold.mutate({ name });
+          createMenu.mutate({ name, householdId });
         }}
         className="flex flex-col gap-2"
       >
         <input
           type="text"
-          placeholder="New Household"
+          placeholder="New Menu"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full rounded-full px-4 py-2 text-black"
@@ -34,9 +38,9 @@ export function CreateHousehold() {
         <button
           type="submit"
           className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
-          disabled={createHousehold.isPending}
+          disabled={createMenu.isPending}
         >
-          {createHousehold.isPending ? "Submitting..." : "Submit"}
+          {createMenu.isPending ? "Submitting..." : "Submit"}
         </button>
       </form>
     </div>
