@@ -1,4 +1,4 @@
-import { relations, sql } from "drizzle-orm";
+import { relations, sql, type  InferSelectModel } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -40,6 +40,9 @@ export const posts = createTable(
   })
 );
 
+/**
+ * a menu belongs to a household
+  **/
 export const menus = createTable('menu', {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -54,9 +57,18 @@ export const menus = createTable('menu', {
   updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date()
   ),
-  householdId :varchar('household_id', {length: 255})
-    .references(() => households.id),
+  householdId: varchar('household_id', {length: 255}).notNull()
+    .references(() => households.id, {onDelete: 'cascade'}),
 })
+
+export type SelectMenu = InferSelectModel<typeof menus>
+
+export const menuRelations = relations(menus, ({one})=> ({
+  household: one(households, {
+    fields: [ menus.householdId ],
+    references: [households.id]
+  })
+}))
 
 export const Items = createTable('item', {
   id: varchar("id", { length: 255 })
@@ -65,6 +77,8 @@ export const Items = createTable('item', {
     .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }).notNull(),
   createdById: varchar("created_by", { length: 255 })
+    .references(() => users.id),
+  updatedById: varchar("updated_by", { length: 255 })
     .references(() => users.id),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
@@ -88,13 +102,16 @@ export const households = createTable('household', {
   headOfHouseholdId: varchar('head_of_household_id').notNull()
 })
 
+export type SelectHousehold = InferSelectModel<typeof households>
+
 export const householdsRelations = relations(households,({one, many}) =>({
   headOfHousehold: one(users, {
     fields: [ households.headOfHouseholdId ],
     references: [users.id],
     relationName: 'head_of_household'
   }),
-  users: many(usersToHouseholds)
+  users: many(usersToHouseholds),
+  menus: many(menus)
 }))
 
 export const usersToHouseholds = createTable('users_to_households', {

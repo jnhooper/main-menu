@@ -9,7 +9,7 @@
 
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { ZodError } from "zod";
+import { ZodError, z } from "zod";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
@@ -131,3 +131,19 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+//export const householdProcedure = protectedProcedure
+//  .input(z.object({ householdId: z.string() }))
+//  .use(timingMiddleware)
+//  .use(({ ctx, next }) => {
+//    if (!ctx.session || !ctx.session.user) {
+//      throw new TRPCError({ code: "UNAUTHORIZED" });
+//    }
+//  if(ctx.session.user.id)
+//    return next({
+//      ctx: {
+//        // infers the `session` as non-nullable
+//        session: { ...ctx.session, user: ctx.session.user },
+//      },
+//    });
+//  });

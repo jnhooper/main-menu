@@ -31,6 +31,14 @@ export const householdsRouter = createTRPCRouter({
     }
   }),
 
+  getHousehold: protectedProcedure
+  .input(z.object({id: z.string().min(1)}))
+  .query(async ({ctx, input})=>{
+   return await ctx.db.query.households.findFirst({
+      where: eq(households.id, input.id)
+    })
+  }),
+
   create: protectedProcedure
   .input(z.object({ name: z.string().min(1) }))
   .mutation(async ({ ctx, input }) => {
