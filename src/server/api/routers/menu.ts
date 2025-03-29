@@ -5,7 +5,6 @@ import {eq} from 'drizzle-orm'
 
 import {
   createTRPCRouter,
-  protectedProcedure,
   houseMemberProcedure
 } from "~/server/api/trpc";
 import {  menus, households } from "~/server/db/schema";
@@ -14,7 +13,6 @@ export const menusRouter = createTRPCRouter({
 
   getHouseholdMenus: houseMemberProcedure
   .query(async ({ ctx, input }) => {
-
     //todo create middleware like protected procedure that only lets
     //users from the household get info
     const householdMenus = await ctx.db.query.menus.findMany({

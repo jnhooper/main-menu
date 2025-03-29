@@ -65,14 +65,15 @@ export const menus = createTable('menu', {
 
 export type SelectMenu = InferSelectModel<typeof menus>
 
-export const menuRelations = relations(menus, ({one})=> ({
+export const menuRelations = relations(menus, ({one, many})=> ({
   household: one(households, {
     fields: [ menus.householdId ],
     references: [households.id]
-  })
+  }),
+  items: many(items)
 }))
 
-export const Items = createTable('item', {
+export const items = createTable('item', {
   id: varchar("id", { length: 255 })
     .notNull()
     .primaryKey()
@@ -85,12 +86,23 @@ export const Items = createTable('item', {
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
+  lastSelected:timestamp("last_selected", { withTimezone: true }),
   updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date()
   ),
-  imageUrl: varchar("image_url", { length: 256 }),
-  description:varchar("image_url", { length: 256 })
+  imageUrl: text("image_url"),
+  link: text("link"),
+  description:text("description"),
+  isVisible: boolean('is_visible'),
+  menuId: varchar('menu_id')
 })
+
+export const itemRelations = relations(items, ({one}) => ({
+  menu: one(menus, {
+    fields: [items.menuId],
+    references: [menus.id],
+  })
+}));
 
 
 
@@ -159,6 +171,7 @@ export const users = createTable("user", {
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
+  defaultHouseholdId: varchar("default_household_id", { length: 255 })
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

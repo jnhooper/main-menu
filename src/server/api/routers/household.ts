@@ -6,9 +6,10 @@ import {eq} from 'drizzle-orm'
 
 import {
   createTRPCRouter,
+  houseMemberProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { households, usersToHouseholds } from "~/server/db/schema";
+import { households, usersToHouseholds, users } from "~/server/db/schema";
 
 
 export const householdsRouter = createTRPCRouter({
@@ -30,6 +31,16 @@ export const householdsRouter = createTRPCRouter({
     } else{
       return []
     }
+  }),
+
+  markAsDefault: houseMemberProcedure
+  .mutation(async({ctx, input})=> {
+    return await ctx.db.update(users).set({
+      defaultHouseholdId: input.householdId,
+    }).where(eq(
+      users.id,
+      ctx.session.user.id
+    )).returning()
   }),
 
   getHousehold: protectedProcedure
