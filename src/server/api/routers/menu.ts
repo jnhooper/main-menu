@@ -6,15 +6,13 @@ import {eq} from 'drizzle-orm'
 import {
   createTRPCRouter,
   protectedProcedure,
+  houseMemberProcedure
 } from "~/server/api/trpc";
 import {  menus, households } from "~/server/db/schema";
 
 export const menusRouter = createTRPCRouter({
 
-  getHouseholdMenus: protectedProcedure
-  .input(z.object({
-    householdId: z.string().min(1)
-  }))
+  getHouseholdMenus: houseMemberProcedure
   .query(async ({ ctx, input }) => {
 
     //todo create middleware like protected procedure that only lets
@@ -26,17 +24,16 @@ export const menusRouter = createTRPCRouter({
 
   }),
 
-  create: protectedProcedure
+  create: houseMemberProcedure
   .input(z.object({
     name: z.string().min(1),
-    householdId: z.string(),
   }))
   .mutation(async ({ ctx, input }) => {
     const menuArr = await ctx.db.insert(menus).values({
       name: input.name,
       householdId: input.householdId,
       createdById: ctx.session.user.id,
-      updatedById: ctx.session.user.id
+      lastUpdatedById: ctx.session.user.id
     }).returning();
     const menu = menuArr.pop()
     if(menu){
@@ -47,7 +44,7 @@ export const menusRouter = createTRPCRouter({
   }),
 
 
-  delete: protectedProcedure.input(z.object({id: z.string()}))
+  delete: houseMemberProcedure.input(z.object({id: z.string()}))
   .mutation(async ({ctx, input})=> {
     if(ctx.session.user){
       const menu = await ctx.db.query.menus.findFirst({

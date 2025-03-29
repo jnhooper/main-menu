@@ -10,6 +10,7 @@ import {
 } from "~/server/api/trpc";
 import { households, usersToHouseholds } from "~/server/db/schema";
 
+
 export const householdsRouter = createTRPCRouter({
   getMyHouseholds: protectedProcedure
   .query(async ({ ctx }) => {

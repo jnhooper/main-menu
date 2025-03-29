@@ -10,6 +10,8 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError, z } from "zod";
+import {eq, and} from 'drizzle-orm'
+import { usersToHouseholds } from "~/server/db/schema";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
@@ -101,6 +103,7 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   return result;
 });
 
+
 /**
  * Public (unauthenticated) procedure
  *
@@ -132,18 +135,37 @@ export const protectedProcedure = t.procedure
     });
   });
 
-//export const householdProcedure = protectedProcedure
-//  .input(z.object({ householdId: z.string() }))
-//  .use(timingMiddleware)
-//  .use(({ ctx, next }) => {
-//    if (!ctx.session || !ctx.session.user) {
-//      throw new TRPCError({ code: "UNAUTHORIZED" });
-//    }
-//  if(ctx.session.user.id)
-//    return next({
-//      ctx: {
-//        // infers the `session` as non-nullable
-//        session: { ...ctx.session, user: ctx.session.user },
-//      },
-//    });
-//  });
+
+//const housememberMiddleware = t.middleware(async (opts) => {
+//  opts.ctx.db.query.households
+//
+//})
+
+export const houseMemberProcedure = protectedProcedure
+  .input(z.object({ householdId: z.string() }))
+  .use(timingMiddleware)
+  .use( async function  isHouseholdMember (opts){
+  //const myHouseholds = await opts.ctx.db.query.usersToHouseholds.findFirst({
+  //      where:eq(usersToHouseholds.householdId, opts.ctx.session?.user.id) 
+  //})
+  const myHouseholds = await opts.ctx.db.select().from(usersToHouseholds)
+    .where(
+        eq(usersToHouseholds.userId, opts.ctx.session.user.id),
+      )
+  const inHousehold = myHouseholds.filter(household =>{
+    return household.householdId === opts.input.householdId
+  });
+
+  if(inHousehold.length === 0){
+    throw new TRPCError({ code: "UNAUTHORIZED", message: 'You do not belong to this household' });
+  }
+  return opts.next({
+    ctx: {
+      session: {
+        ...opts.ctx.session,
+        householdIds: myHouseholds.map(hh=> hh.householdId)
+      }
+    }
+  })
+
+});

@@ -51,6 +51,8 @@ export const menus = createTable('menu', {
   name: varchar("name", { length: 255 }).notNull(),
   createdById: varchar("created_by", { length: 255 })
     .references(() => users.id),
+  lastUpdatedById: varchar("last_updated_by", { length: 255 })
+    .references(() => users.id),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
