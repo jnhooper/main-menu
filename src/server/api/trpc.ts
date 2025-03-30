@@ -11,7 +11,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError, z } from "zod";
 import {eq, and} from 'drizzle-orm'
-import { usersToHouseholds } from "~/server/db/schema";
+import { households, usersToHouseholds } from "~/server/db/schema";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
@@ -53,7 +53,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       data: {
         ...shape.data,
         zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+        error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },
@@ -122,18 +122,18 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure
-  .use(timingMiddleware)
-  .use(({ ctx, next }) => {
-    if (!ctx.session || !ctx.session.user) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
-    }
-    return next({
-      ctx: {
-        // infers the `session` as non-nullable
-        session: { ...ctx.session, user: ctx.session.user },
-      },
-    });
+.use(timingMiddleware)
+.use(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
+    },
   });
+});
 
 
 //const housememberMiddleware = t.middleware(async (opts) => {
@@ -142,16 +142,13 @@ export const protectedProcedure = t.procedure
 //})
 
 export const houseMemberProcedure = protectedProcedure
-  .input(z.object({ householdId: z.string() }))
-  .use(timingMiddleware)
-  .use( async function  isHouseholdMember (opts){
-  //const myHouseholds = await opts.ctx.db.query.usersToHouseholds.findFirst({
-  //      where:eq(usersToHouseholds.householdId, opts.ctx.session?.user.id) 
-  //})
+.input(z.object({ householdId: z.string() }))
+.use(timingMiddleware)
+.use( async function  isHouseholdMember (opts){
   const myHouseholds = await opts.ctx.db.select().from(usersToHouseholds)
     .where(
-        eq(usersToHouseholds.userId, opts.ctx.session.user.id),
-      )
+      eq(usersToHouseholds.userId, opts.ctx.session.user.id),
+    )
   const inHousehold = myHouseholds.filter(household =>{
     return household.householdId === opts.input.householdId
   });
@@ -167,5 +164,30 @@ export const houseMemberProcedure = protectedProcedure
       }
     }
   })
-
 });
+
+
+export const headOfHousehold = protectedProcedure
+.input(z.object({ householdId: z.string() }))
+.use(timingMiddleware)
+.use( async function  isHeadOfHousehold (opts){
+  const household = await opts.ctx.db.query.households.findFirst({
+    where: eq(households.id, opts.input.householdId),
+  })
+  if(household?.headOfHouseholdId !== opts.ctx.session.user.id){
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: 'Only the head of household can perform this action',
+    });
+  }
+
+  return opts.next({
+    ctx: {
+      session: {
+        ...opts.ctx.session,
+        headOfHousehold: true
+      }
+    }
+  })
+});
+
