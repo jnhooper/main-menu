@@ -1,11 +1,9 @@
 import { Button } from '~/components/ui/button'
 import { api } from "~/trpc/react";
-import { type api as serverApi } from "~/trpc/server";
+import type {SelectHousehold} from '~/server/db/schema'
 
 interface DeleteHouseholdButtonProps {
-  id: Awaited<ReturnType<
-    (typeof serverApi)['households']['delete']
-  >>['id']
+  id: SelectHousehold['id']
 }
 
 export const DeleteHouseholdButton = (props: DeleteHouseholdButtonProps) => {
@@ -19,7 +17,7 @@ export const DeleteHouseholdButton = (props: DeleteHouseholdButtonProps) => {
   return (
     <Button
       variant='destructive'
-      onClick={() => deleteHousehold.mutate({ id })}
+      onClick={() => deleteHousehold.mutate({ householdId: id })}
     >
       remove
     </Button>

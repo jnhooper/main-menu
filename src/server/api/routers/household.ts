@@ -8,6 +8,7 @@ import {
   createTRPCRouter,
   houseMemberProcedure,
   protectedProcedure,
+  headOfHousehold,
 } from "~/server/api/trpc";
 import { households, usersToHouseholds, users } from "~/server/db/schema";
 
@@ -27,7 +28,12 @@ export const householdsRouter = createTRPCRouter({
         },
         where:eq(usersToHouseholds.userId, ctx.session?.user.id) 
       })
-      return myHouseholds
+      return myHouseholds.map(hh => {
+         return { 
+          ...hh,
+          isDefaultHoushold: hh.householdId === ctx.session.user.defaultHouseholdId
+        }
+      })
     } else{
       return []
     }
@@ -58,12 +64,31 @@ export const householdsRouter = createTRPCRouter({
       name: input.name,
       headOfHouseholdId: ctx.session.user.id,
     }).returning();
+
     const household = householdArr.pop()
     if(household){
       await ctx.db.insert(usersToHouseholds).values({
         userId: ctx.session.user.id,
         householdId: household.id
       })
+      
+      //check if they are in other households if not
+      //it's the default one
+      const myHouseholds = await ctx.db.query.usersToHouseholds
+        .findMany({
+          where: eq(usersToHouseholds.userId, ctx.session.user.id)
+        })
+
+      if (myHouseholds.length === 1){
+        await ctx.db.update(users).set({
+          defaultHouseholdId: household.id,
+        }).where(eq(
+          users.id,
+          ctx.session.user.id
+        )).returning()
+      }
+
+
       return household
     }
     //how to hande error?
@@ -71,29 +96,12 @@ export const householdsRouter = createTRPCRouter({
 
   }),
 
-  delete: protectedProcedure.input(z.object({id: z.string()}))
+  delete: headOfHousehold
   .mutation(async ({ctx, input})=> {
-    if(ctx.session.user){
-      const household = await ctx.db.query.households.findFirst({
-        where:eq(households.id, input.id) 
-      })
-      if(household?.headOfHouseholdId !== ctx.session.user.id){
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-      else {
-        //await ctx.db.delete(usersToHouseholds).where(eq(
-        //  households.id,
-        //  input.id
-        //))
-        await ctx.db.delete(households).where(
-          eq(households.id, input.id)
-        )
-      }
-      return household
-    }
-
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-  )
+    const household = await ctx.db.delete(households).where(
+      eq(households.id, input.householdId)
+    ).returning()
+    return household
+  })
 
 });

@@ -15,7 +15,7 @@ interface DeleteMenuButtonProps {
 export const DeleteMenuButton = (props: DeleteMenuButtonProps) => {
   const utils = api.useUtils();
   const { id, householdId } = props
-  const deleteHousehold = api.menu.delete.useMutation({
+  const deleteMenu = api.menu.delete.useMutation({
     onSuccess: async () => {
       await utils.menu.getHouseholdMenus.invalidate({householdId})
     },
@@ -23,7 +23,7 @@ export const DeleteMenuButton = (props: DeleteMenuButtonProps) => {
   return (
     <Button
       variant='destructive'
-      onClick={() => deleteHousehold.mutate({ id })}
+      onClick={() => deleteMenu.mutate({ id, householdId })}
     >
       remove
     </Button>

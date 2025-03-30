@@ -5,7 +5,8 @@ import {eq} from 'drizzle-orm'
 
 import {
   createTRPCRouter,
-  houseMemberProcedure
+  houseMemberProcedure,
+  protectedProcedure
 } from "~/server/api/trpc";
 import {  menus, households } from "~/server/db/schema";
 
@@ -19,8 +20,29 @@ export const menusRouter = createTRPCRouter({
       where: eq(menus.householdId, input.householdId)
     })
     return householdMenus
-
   }),
+
+
+  getDefaultMenus: protectedProcedure
+  .query(async({ctx}) => {
+    if(!ctx.session.user.defaultHouseholdId){
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'No default household selected',
+      })
+    }
+    const defaultMenus = await ctx.db.query.menus.findMany({
+      where: eq(menus.householdId, ctx.session.user.defaultHouseholdId)
+    })
+    if(defaultMenus.length ===0){
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'No default household selected',
+      })
+    }
+    return defaultMenus
+  }),
+
 
   create: houseMemberProcedure
   .input(z.object({
