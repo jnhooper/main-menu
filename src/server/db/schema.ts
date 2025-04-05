@@ -4,11 +4,13 @@ import {
   index,
   integer,
   pgTableCreator,
+  pgTable,
   primaryKey,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
 import { type AdapterAccount } from "next-auth/adapters";
 
 /**
@@ -61,6 +63,7 @@ export const menus = createTable('menu', {
   ),
   householdId: varchar('household_id', {length: 255}).notNull()
     .references(() => households.id, {onDelete: 'cascade'}),
+  isPrivate: boolean('is_private').default(false)
 })
 
 export type SelectMenu = InferSelectModel<typeof menus>
@@ -94,7 +97,17 @@ export const items = createTable('item', {
   link: text("link"),
   description:text("description"),
   isVisible: boolean('is_visible'),
-  menuId: varchar('menu_id')
+  menuId: varchar('menu_id').notNull()
+})
+
+export const apiItem = createInsertSchema(items);
+export const apiCreateItem = apiItem.omit({
+  id: true,
+  createdById: true,
+  createdAt: true,
+  updatedAt: true,
+  updatedById: true,
+  lastSelected: true,
 })
 
 export const itemRelations = relations(items, ({one}) => ({
