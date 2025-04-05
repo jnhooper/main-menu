@@ -20,6 +20,8 @@ export function CreateItem(props: CreateitemProps) {
     onSuccess: async () => {
       await utils.item.getMenuItems.invalidate({menuId})
       setName("");
+      setDescription("")
+      setImgUrl("")
     },
   });
 
