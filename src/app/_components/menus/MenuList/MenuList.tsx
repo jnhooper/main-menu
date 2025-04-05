@@ -29,7 +29,7 @@ export function MenuList(props: MenuListProps) {
           {
             myMenus.map(menu=>(
               <li key={menu.id}>
-              <Link href={`/hh/${menu.id}`}>
+              <Link href={`/menu/${menu.id}`}>
                 {menu.name}
                 </Link>
               <DeleteMenuButton

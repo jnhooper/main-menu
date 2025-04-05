@@ -6,7 +6,8 @@ import {eq} from 'drizzle-orm'
 import {
   createTRPCRouter,
   houseMemberProcedure,
-  protectedProcedure
+  protectedProcedure,
+isPrivateMenuProcedure,
 } from "~/server/api/trpc";
 import {  menus, households } from "~/server/db/schema";
 
@@ -22,6 +23,20 @@ export const menusRouter = createTRPCRouter({
     return householdMenus
   }),
 
+  getMenu: isPrivateMenuProcedure
+  .query(async({ctx}) => {
+    //const {
+    //  householdId,
+    //  createdById,
+    //  lastUpdatedById,
+    //  ...rest
+    //} = ctx.menu
+    // if it's private then based on the procedure we are logged in and able
+    // to view the menu, so we can return everything.
+    // for seom reason we need the spread to get types flowing
+    return ctx.menu
+  }),
+
 
   getDefaultMenus: protectedProcedure
   .query(async({ctx}) => {
@@ -34,13 +49,16 @@ export const menusRouter = createTRPCRouter({
     const defaultMenus = await ctx.db.query.menus.findMany({
       where: eq(menus.householdId, ctx.session.user.defaultHouseholdId)
     })
-    if(defaultMenus.length ===0){
-      throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'No default household selected',
-      })
+    //if(defaultMenus.length ===0){
+    //  throw new TRPCError({
+    //    code: 'NOT_FOUND',
+    //    message: 'No menus found',
+    //  })
+    //}
+    return {
+      menus: defaultMenus,
+      householdId: ctx.session.user.defaultHouseholdId,
     }
-    return defaultMenus
   }),
 
 

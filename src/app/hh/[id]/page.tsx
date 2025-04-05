@@ -8,7 +8,7 @@ export default async function Page({
     params: Promise<{ id: string }>
   }) {
   const { id } = await params
-  const household = await  api.households.getHousehold({id})
+  const household = await  api.household.getHousehold({id})
   const menus = await api.menu.getHouseholdMenus({householdId: id})
   return (
     <HydrateClient>

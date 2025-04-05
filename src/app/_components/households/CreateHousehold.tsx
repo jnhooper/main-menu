@@ -7,10 +7,10 @@ export function CreateHousehold() {
 
   const utils = api.useUtils();
   const [name, setName] = useState("");
-  const createHousehold = api.households.create.useMutation({
+  const createHousehold = api.household.create.useMutation({
     onSuccess: async () => {
       //await utils.post.invalidate();
-      await utils.households.getMyHouseholds.invalidate()
+      await utils.household.getMyHouseholds.invalidate()
       setName("");
     },
   });

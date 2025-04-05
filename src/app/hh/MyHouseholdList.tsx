@@ -7,23 +7,23 @@ import { DeleteHouseholdButton } from "../_components/households/DeleteHousehold
 
 interface MyHouseholdListProps {
   initialHouseholds?: Awaited<ReturnType<
-    (typeof serverApi)['households']['getMyHouseholds']
+    (typeof serverApi)['household']['getMyHouseholds']
   >>
 }
 
 export function MyHouseholdList(props: MyHouseholdListProps) {
   //const { initialHouseholds } = props
   const utils = api.useUtils();
-  const [myHouseholds] = api.households.getMyHouseholds.useSuspenseQuery(
+  const [myHouseholds] = api.household.getMyHouseholds.useSuspenseQuery(
     undefined,
     {
       initialData: props.initialHouseholds
     }
   );
 
-  const setAsDefault = api.households.markAsDefault.useMutation({
+  const setAsDefault = api.household.markAsDefault.useMutation({
     onSuccess: async () => {
-      await utils.households.getMyHouseholds.invalidate()
+      await utils.household.getMyHouseholds.invalidate()
     },
   });
 

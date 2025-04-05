@@ -11,7 +11,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError, z } from "zod";
 import {eq, and} from 'drizzle-orm'
-import { households, usersToHouseholds } from "~/server/db/schema";
+import { households, menus, usersToHouseholds } from "~/server/db/schema";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
@@ -135,6 +135,54 @@ export const protectedProcedure = t.procedure
   });
 });
 
+export const isPrivateMenuProcedure = t.procedure
+.use(timingMiddleware)
+.input(z.object({ menuId: z.string() }))
+.use(async ({ctx, next, input})=>{
+  const menuArray = await ctx.db.select().from(menus).where(
+    eq(menus.id, input.menuId)
+  )
+  const menu = menuArray[0]
+  if(menu?.isPrivate){
+    if (!ctx.session || !ctx.session.user) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    else{
+      const menuHouseholds = await ctx.db.select().from(usersToHouseholds)
+        .where(
+          and(
+            eq(usersToHouseholds.userId, ctx.session.user.id),
+            eq(usersToHouseholds.householdId, menu.householdId),
+          )
+        )
+      if(menuHouseholds.length === 0){
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be a member of the household to view this menu"
+        });
+      }
+      else {
+        return next({
+          ctx: {
+            // infers the `session` as non-nullable
+            session: { ...ctx.session, user: ctx.session.user },
+            menu,
+            menuHousehold: menuHouseholds[0]
+          },
+        })
+
+      }
+    }
+  }else {
+    return next({
+      ctx:{
+        menu
+      }
+    })
+  }
+})
+
+
 
 //const housememberMiddleware = t.middleware(async (opts) => {
 //  opts.ctx.db.query.households
@@ -165,7 +213,6 @@ export const houseMemberProcedure = protectedProcedure
     }
   })
 });
-
 
 export const headOfHousehold = protectedProcedure
 .input(z.object({ householdId: z.string() }))
