@@ -3,6 +3,7 @@
 import { api } from "~/trpc/react";
 import { type api as serverApi } from "~/trpc/server";
 import type {SelectMenu} from '~/server/db/schema'
+import {MediaCard} from '~/app/_components/MediaCard'
 
 interface MenuListProps {
   initialItems?: Awaited<ReturnType<
@@ -27,6 +28,11 @@ export function ItemList(props: MenuListProps) {
           {
             myItems.map(item=>(
               <li key={item.id}>
+              <MediaCard
+                title={item.name}
+                imgUrl={item.imageUrl}
+                description={item.description}
+              />
                 {item.name}
               </li>
             ))

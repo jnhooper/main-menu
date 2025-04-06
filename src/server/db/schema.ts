@@ -97,7 +97,7 @@ export const items = createTable('item', {
   updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date()
   ),
-  imageUrl: text("image_url"),
+  imageUrl: text("image_url").notNull(),
   link: text("link"),
   description:text("description"),
   isVisible: boolean('is_visible'),
