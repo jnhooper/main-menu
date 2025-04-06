@@ -16,12 +16,12 @@ export const itemRouter = createTRPCRouter({
       where: eq(items.menuId, input.menuId)
     })
 
-    if(!ctx.menu.isPrivate){
-      return menuItems.map(item => {
-        const {updatedById, createdById, ...rest} = item
-        return rest
-      })
-    }
+    //if(!ctx.menu.isPrivate){
+    //  return menuItems.map(item => {
+    //    const {updatedById, createdById, ...rest} = item
+    //    return rest
+    //  })
+    //}
     return menuItems
   }),
   create: isPrivateMenuProcedure.

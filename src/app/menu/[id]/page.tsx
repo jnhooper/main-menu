@@ -1,4 +1,5 @@
 import CreateItem from "~/app/_components/items/CreateItem";
+import ItemList from "~/app/_components/items/ItemList";
 import {  HydrateClient, api } from "~/trpc/server";
 
 export default async function Page({
@@ -16,10 +17,8 @@ export default async function Page({
     <HydrateClient>
       <div>
         My menu: {menu?.name}
-        {menu?.householdId ? 
-        <CreateItem menuId={menu.id} /> :
-          null
-        }
+        <CreateItem menuId={id} /> 
+        <ItemList menuId={id} initialItems={items}/>
       </div>
     </HydrateClient>
   );
