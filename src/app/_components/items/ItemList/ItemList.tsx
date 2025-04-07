@@ -33,7 +33,6 @@ export function ItemList(props: MenuListProps) {
                 imgUrl={item.imageUrl}
                 description={item.description}
               />
-                {item.name}
               </li>
             ))
           }

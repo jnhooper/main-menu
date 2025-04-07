@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import styles from './styles.module.css'
 interface MediaCard {
   title: string
@@ -10,7 +9,7 @@ export const MediaCard = (props: MediaCard) => {
   const {title, imgUrl} = props
   return (
     <div className={styles.cardWrapper}>
-      <Image
+      <img
         src={imgUrl}
         alt={`Poster for ${title}`}
       />
