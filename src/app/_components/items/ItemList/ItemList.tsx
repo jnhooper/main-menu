@@ -22,14 +22,21 @@ export function ItemList(props: MenuListProps) {
   );
 
 
+  const superlong = 'lskjfsdl fjsdlkfj lksjdf sl sldkfj lskjd fsldfkj sdlfkj sdlfsdkj flsdkjfsdlkfj '
   return (
     <div className="w-full max-w-xs">
+      <h2 className='text-3xl'>
+        Sosi
+      </h2>
+      <h2 className='text-3xl'>
+        Adrian
+      </h2>
         <ul>
           {
-            myItems.map(item=>(
+            myItems.map((item, index)=>(
               <li key={item.id}>
               <MediaCard
-                title={item.name}
+                title={index === 0 ?  superlong: item.name}
                 imgUrl={item.imageUrl}
                 description={item.description}
               />
