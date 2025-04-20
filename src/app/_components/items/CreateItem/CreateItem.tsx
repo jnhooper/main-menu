@@ -3,6 +3,7 @@ import { useState } from "react";
 import {type SelectMenu} from '~/server/db/schema'
 
 import { api } from "~/trpc/react";
+import {TimeDuration} from '../TimeDuration'
 
 
 
@@ -17,12 +18,14 @@ export function CreateItem(props: CreateitemProps) {
   const [description, setDescription] = useState("");
   const [imageUrl, setImgUrl] = useState("");
   const [trailerHref, setTrailerHref] = useState("");
+  const [duration, setDuration] = useState(0);
   const createItem = api.item.createMovie.useMutation({
     onSuccess: async () => {
       await utils.item.getMenuItems.invalidate({menuId})
       setName("");
       setDescription("")
       setImgUrl("")
+      setDuration(0)
     },
   });
 
@@ -67,6 +70,11 @@ export function CreateItem(props: CreateitemProps) {
           value={trailerHref}
           onChange={(e) => setTrailerHref(e.target.value)}
           className="w-full rounded-full px-4 py-2 text-black"
+        />
+        <TimeDuration
+          onChange={(e)=> {
+            setDuration(e.total)
+          }}
         />
         <button
           type="submit"
