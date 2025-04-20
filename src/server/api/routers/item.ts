@@ -3,9 +3,12 @@ import {eq} from 'drizzle-orm'
 import {
   createTRPCRouter,
   isPrivateMenuProcedure,
-  houseMemberProcedure
 } from "~/server/api/trpc";
-import { apiCreateItem, items } from "~/server/db/schema";
+import {
+  apiCreateItem,
+  apiCreateMovieItem,
+  items,
+} from "~/server/db/schema";
 
 export const itemRouter = createTRPCRouter({
   getMenuItems: isPrivateMenuProcedure
@@ -24,6 +27,7 @@ export const itemRouter = createTRPCRouter({
     //}
     return menuItems
   }),
+
   create: isPrivateMenuProcedure.
   input(apiCreateItem)
   .mutation(async ( {ctx, input} ) => {
@@ -37,6 +41,25 @@ export const itemRouter = createTRPCRouter({
       isVisible: input.isVisible,
       imageUrl: input.imageUrl,
       createdById: ctx.session.user.id
+    }).returning()
+   return itemArr.pop() 
+
+  }),
+  
+  createMovie: isPrivateMenuProcedure.
+  input(apiCreateMovieItem)
+  .mutation(async ( {ctx, input} ) => {
+
+    //TODO CHECK THAT MENU BELONGS TO HOUSEHOLD
+    const itemArr = await ctx.db.insert(items).values({
+      name: input.name,
+      description:input.description,
+      menuId: input.menuId,
+      link: input.link,
+      isVisible: input.isVisible,
+      imageUrl: input.imageUrl,
+      createdById: ctx.session.user.id,
+      metadata: input.metadata
     }).returning()
    return itemArr.pop() 
 

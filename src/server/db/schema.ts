@@ -13,9 +13,11 @@ import {
   text,
   timestamp,
   varchar,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { type AdapterAccount } from "next-auth/adapters";
+import {z} from "zod"
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -101,18 +103,38 @@ export const items = createTable('item', {
   link: text("link"),
   description:text("description"),
   isVisible: boolean('is_visible'),
-  menuId: varchar('menu_id').notNull()
+  menuId: varchar('menu_id').notNull(),
+  metadata: jsonb('metadata')
 })
 
 export const apiItem = createInsertSchema(items);
-export const apiCreateItem = apiItem.omit({
+
+const itemOmit = {
   id: true,
   createdById: true,
   createdAt: true,
   updatedAt: true,
   updatedById: true,
   lastSelected: true,
-})
+} as const
+const movieMetadata = z.object({
+    /**
+     * runtime of the movie
+     * */
+    runTime: z.number().optional(),
+    /**
+   * link to the trailer
+   **/
+    trailerHref: z.string().url().optional()
+  }).optional()
+
+export const apiMovieItem = createInsertSchema(items, {
+  metadata: movieMetadata
+});
+
+export const apiCreateItem = apiItem.omit(itemOmit)
+
+export const apiCreateMovieItem = apiMovieItem.omit(itemOmit)
 
 export const itemRelations = relations(items, ({one}) => ({
   menu: one(menus, {

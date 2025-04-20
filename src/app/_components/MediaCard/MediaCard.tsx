@@ -18,10 +18,10 @@ interface MediaCard {
 }
 export const MediaCard = (props: MediaCard) => {
   const {title, imgUrl} = props
-  const cardWidth =320;
+  const cardWidth = 320;
   return (
     <Expandable
-      expandDirection="vertical"
+      expandDirection="both"
       expandBehavior="replace"
       initialDelay={0.2}
       onExpandStart={() => console.log("Expanding meeting card...")}
@@ -31,10 +31,10 @@ export const MediaCard = (props: MediaCard) => {
         <ExpandableCard
           isFullWidth
           className="w-full relative"
-          collapsedSize={{ width: cardWidth, height: 640 }}
-          expandedSize={{ width: cardWidth, height: 880 }}
+          collapsedSize={{ width: cardWidth,  }}
+          expandedSize={{ width: (cardWidth * 1.1)  }}
           hoverToExpand={false}
-          expandDelay={200}
+          expandDelay={100}
           collapseDelay={500}
         >
           <ExpandableCardHeader className={styles.expandableHeaderWrapper}>

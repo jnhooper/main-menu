@@ -4,6 +4,7 @@ import { api } from "~/trpc/react";
 import { type api as serverApi } from "~/trpc/server";
 import type {SelectMenu} from '~/server/db/schema'
 import {MediaCard} from '~/app/_components/MediaCard'
+import styles from './styles.module.css'
 
 interface MenuListProps {
   initialItems?: Awaited<ReturnType<
@@ -21,22 +22,17 @@ export function ItemList(props: MenuListProps) {
     }
   );
 
-
-  const superlong = 'lskjfsdl fjsdlkfj lksjdf sl sldkfj lskjd fsldfkj sdlfkj sdlfsdkj flsdkjfsdlkfj '
   return (
-    <div className="w-full max-w-xs">
-      <h2 className='text-3xl'>
-        Sosi
-      </h2>
-      <h2 className='text-3xl'>
-        Adrian
-      </h2>
-        <ul>
+    <div className={styles.wrapper}>
+        <ul className={styles.ul}>
           {
-            myItems.map((item, index)=>(
-              <li key={item.id}>
+            myItems.map((item)=>(
+              <li
+                key={item.id}
+              className="mx-auto"
+              >
               <MediaCard
-                title={index === 0 ?  superlong: item.name}
+                title={item.name}
                 imgUrl={item.imageUrl}
                 description={item.description}
               />

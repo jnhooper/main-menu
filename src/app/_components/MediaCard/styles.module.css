@@ -1,6 +1,5 @@
 .expandableHeaderWrapper{
   @apply p-0;
-
   & > *{
     width: 100%;
   }

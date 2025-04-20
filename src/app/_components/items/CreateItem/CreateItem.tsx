@@ -16,7 +16,8 @@ export function CreateItem(props: CreateitemProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImgUrl] = useState("");
-  const createItem = api.item.create.useMutation({
+  const [trailerHref, setTrailerHref] = useState("");
+  const createItem = api.item.createMovie.useMutation({
     onSuccess: async () => {
       await utils.item.getMenuItems.invalidate({menuId})
       setName("");
@@ -58,6 +59,13 @@ export function CreateItem(props: CreateitemProps) {
           placeholder="image url"
           value={imageUrl}
           onChange={(e) => setImgUrl(e.target.value)}
+          className="w-full rounded-full px-4 py-2 text-black"
+        />
+        <input
+          type="text"
+          placeholder="trailer url"
+          value={trailerHref}
+          onChange={(e) => setTrailerHref(e.target.value)}
           className="w-full rounded-full px-4 py-2 text-black"
         />
         <button
