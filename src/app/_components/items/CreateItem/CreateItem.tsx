@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import {type SelectMenu} from '~/server/db/schema'
-
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 import { api } from "~/trpc/react";
 import {TimeDuration} from '../TimeDuration'
 
@@ -18,14 +19,14 @@ export function CreateItem(props: CreateitemProps) {
   const [description, setDescription] = useState("");
   const [imageUrl, setImgUrl] = useState("");
   const [trailerHref, setTrailerHref] = useState("");
-  const [duration, setDuration] = useState(0);
-  const createItem = api.item.createMovie.useMutation({
+  const [runTime, setRunTime] = useState(0);
+  const createMovie = api.item.createMovie.useMutation({
     onSuccess: async () => {
       await utils.item.getMenuItems.invalidate({menuId})
       setName("");
       setDescription("")
       setImgUrl("")
-      setDuration(0)
+      setRunTime(0)
     },
   });
 
@@ -34,54 +35,74 @@ export function CreateItem(props: CreateitemProps) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          createItem.mutate({
+          createMovie.mutate({
             name,
             description,
             imageUrl,
             menuId,
+            metadata: {
+              runTime,
+              trailerHref
+            }
           });
         }}
         className="flex flex-col gap-2"
       >
-        <input
+        <Label htmlFor="itemName">
+          Movie Name
+        </Label>
+        <Input
           type="text"
-          placeholder="Item Name"
+          id="itemName"
+          placeholder="Movie Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full rounded-full px-4 py-2 text-black"
         />
-        <input
-          type="text"
-          placeholder="Item Description"
+        <Label htmlFor="movieDescription">
+          Movie Descirption
+        </Label>
+        <Input
+          type="textarea"
+          id="movieDescription"
+          placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="w-full rounded-full px-4 py-2 text-black"
         />
-        <input
+        <Label htmlFor="movieImgUrl">
+          Image Url
+        </Label>
+        <Input
           type="text"
+          id="movieImgUrl"
           placeholder="image url"
           value={imageUrl}
           onChange={(e) => setImgUrl(e.target.value)}
           className="w-full rounded-full px-4 py-2 text-black"
         />
-        <input
+        <Label htmlFor="movieTrailer">
+          Trailer Url
+        </Label>
+        <Input
           type="text"
-          placeholder="trailer url"
+          id="movieTrailer"
+          placeholder="Trailer Link"
           value={trailerHref}
           onChange={(e) => setTrailerHref(e.target.value)}
           className="w-full rounded-full px-4 py-2 text-black"
         />
         <TimeDuration
           onChange={(e)=> {
-            setDuration(e.total)
+            setRunTime(e.total)
           }}
         />
         <button
           type="submit"
           className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
-          disabled={createItem.isPending}
+          disabled={createMovie.isPending}
         >
-          {createItem.isPending ? "Submitting..." : "Submit"}
+          {createMovie.isPending ? "Submitting..." : "Submit"}
         </button>
       </form>
     </div>
