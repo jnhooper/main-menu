@@ -1,8 +1,11 @@
-import {eq} from 'drizzle-orm'
+import {eq, and} from 'drizzle-orm'
+import {z} from 'zod'
 
 import {
   createTRPCRouter,
   isPrivateMenuProcedure,
+  houseMemberProcedure,
+  canEditMenu
 } from "~/server/api/trpc";
 import {
   apiCreateItem,
@@ -11,22 +14,34 @@ import {
 } from "~/server/db/schema";
 
 export const itemRouter = createTRPCRouter({
-  getMenuItems: isPrivateMenuProcedure
+  getVisibleMenuItems: isPrivateMenuProcedure
+  .query(async ({ ctx, input }) => {
+
+    //const menuItems = await ctx.db.query.items.findMany({
+    //  where: eq(items.menuId, input.menuId)
+    //})
+    const menuItems = await ctx.db.select().from(items).where(
+    and(
+     eq(items.menuId, input.menuId) ,
+     eq(items.isVisible, true) 
+    ));
+
+    return menuItems
+  }),
+
+  getMenuItems: canEditMenu
   .query(async ({ ctx, input }) => {
     //todo create middleware like protected procedure that only lets
     //users from the household get info
     const menuItems = await ctx.db.query.items.findMany({
       where: eq(items.menuId, input.menuId)
     })
-
-    //if(!ctx.menu.isPrivate){
-    //  return menuItems.map(item => {
-    //    const {updatedById, createdById, ...rest} = item
-    //    return rest
-    //  })
-    //}
-    return menuItems
+    return {
+      ...ctx.menu,
+      items:menuItems,
+    }
   }),
+
 
   create: isPrivateMenuProcedure.
   input(apiCreateItem)

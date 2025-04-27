@@ -15,7 +15,7 @@ import {
   varchar,
   jsonb,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { type AdapterAccount } from "next-auth/adapters";
 import {z} from "zod"
 
@@ -73,6 +73,7 @@ export const menus = createTable('menu', {
 })
 
 export type SelectMenu = InferSelectModel<typeof menus>
+export const selectMenuSchema = createSelectSchema(menus)
 
 export const menuRelations = relations(menus, ({one, many})=> ({
   household: one(households, {
@@ -108,6 +109,7 @@ export const items = createTable('item', {
 })
 
 export const apiItem = createInsertSchema(items);
+export type SelectItem = InferSelectModel<typeof items>
 
 const itemOmit = {
   id: true,
@@ -126,15 +128,18 @@ const movieMetadata = z.object({
    * link to the trailer
    **/
     trailerHref: z.string().url().optional()
-  }).optional()
+  })
 
 export const apiMovieItem = createInsertSchema(items, {
-  metadata: movieMetadata
+  metadata: movieMetadata.optional()
 });
 
 export const apiCreateItem = apiItem.omit(itemOmit)
+export type ApiCreateItem = z.infer<typeof apiCreateItem>
 
 export const apiCreateMovieItem = apiMovieItem.omit(itemOmit)
+export type ApiCreateMovieItem = z.infer<typeof apiCreateMovieItem>
+
 
 export const itemRelations = relations(items, ({one}) => ({
   menu: one(menus, {

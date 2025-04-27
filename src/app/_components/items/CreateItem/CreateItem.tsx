@@ -1,8 +1,9 @@
 "use client";
 import { useState } from "react";
-import {type SelectMenu} from '~/server/db/schema'
+import {type SelectMenu, type SelectItem} from '~/server/db/schema'
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
+import {Switch} from "~/components/ui/switch"
 import { api } from "~/trpc/react";
 import {TimeDuration} from '../TimeDuration'
 
@@ -10,39 +11,45 @@ import {TimeDuration} from '../TimeDuration'
 
 interface CreateitemProps {
   menuId: SelectMenu['id']
+  onSubmit: (data?: SelectItem) => void
 };
 export function CreateItem(props: CreateitemProps) {
-  const {menuId} = props
+  const {menuId, onSubmit} = props
 
   const utils = api.useUtils();
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState();
   const [imageUrl, setImgUrl] = useState("");
-  const [trailerHref, setTrailerHref] = useState("");
-  const [runTime, setRunTime] = useState(0);
+  const [trailerHref, setTrailerHref] = useState();
+  const [isVisible, setisVisible] = useState(true);
+  const [runTime, setRunTime] = useState();
   const createMovie = api.item.createMovie.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      await utils.item.getVisibleMenuItems.invalidate({menuId})
       await utils.item.getMenuItems.invalidate({menuId})
+      onSubmit(data);
       setName("");
-      setDescription("")
+      setDescription(undefined)
+      setTrailerHref(undefined)
       setImgUrl("")
-      setRunTime(0)
+      setRunTime(undefined)
     },
   });
 
   return (
-    <div className="w-full max-w-xs">
+    <div className="w-full max-w-xs m-auto">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           createMovie.mutate({
             name,
             description,
-            imageUrl,
+            imageUrl: imageUrl,
+            isVisible,
             menuId,
             metadata: {
-              runTime,
-              trailerHref
+              runTime: runTime ?? undefined,
+              trailerHref: trailerHref ?? undefined
             }
           });
         }}
@@ -80,6 +87,16 @@ export function CreateItem(props: CreateitemProps) {
           value={imageUrl}
           onChange={(e) => setImgUrl(e.target.value)}
           className="w-full rounded-full px-4 py-2 text-black"
+        />
+        <Label htmlFor="visibleSwitch">
+          is item visible
+        </Label>
+        <Switch
+          id="visibleSwitch"
+          checked={isVisible}
+          onCheckedChange={() => {
+            setisVisible(!isVisible)
+          }}
         />
         <Label htmlFor="movieTrailer">
           Trailer Url

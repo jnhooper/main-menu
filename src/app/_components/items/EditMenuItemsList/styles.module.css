@@ -1,0 +1,11 @@
+.listWrapper {
+  display: grid;
+}
+
+.wrapper {
+  @apply w-full flex place-content-center;
+}
+
+.ul {
+  @apply flex flex-col gap-8; 
+}

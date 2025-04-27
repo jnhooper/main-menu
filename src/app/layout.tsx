@@ -15,9 +15,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html
+      lang="en"
+      className={`${GeistSans.variable} bg-background antialiased`}
+    >
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <div vaul-drawer-wrapper="" className="bg-background">
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+        </div>
       </body>
     </html>
   );

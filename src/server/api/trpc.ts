@@ -183,12 +183,6 @@ export const isPrivateMenuProcedure = t.procedure
 })
 
 
-
-//const housememberMiddleware = t.middleware(async (opts) => {
-//  opts.ctx.db.query.households
-//
-//})
-
 export const houseMemberProcedure = protectedProcedure
 .input(z.object({ householdId: z.string() }))
 .use(timingMiddleware)
@@ -213,6 +207,34 @@ export const houseMemberProcedure = protectedProcedure
     }
   })
 });
+
+export const canEditMenu = protectedProcedure
+.input(z.object({menuId: z.string()}))
+.use(timingMiddleware)
+.use(async (opts) => {
+  const result = await opts.ctx.db
+    .select().from(menus).leftJoin(
+      usersToHouseholds,
+      and(
+        eq(menus.householdId, usersToHouseholds.householdId),
+        eq(usersToHouseholds.userId, opts.ctx.session.user.id)
+      )
+    )
+
+  const menu = result[0]?.menu
+  if(!menu){
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: 'You must belong to the household to edit a menu',
+    });
+  }else {
+    return opts.next({
+      ctx: {
+        menu 
+      }
+    })
+  }
+})
 
 export const headOfHousehold = protectedProcedure
 .input(z.object({ householdId: z.string() }))
