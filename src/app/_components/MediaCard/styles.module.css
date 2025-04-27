@@ -16,7 +16,7 @@
 }
 
 .image {
-  @apply object-cover w-[100%] h-[100%];
+  @apply object-cover w-[100%] h-[100%] rounded-lg sm:rounded-xl md:rounded-[2rem];
   grid-area: 1/1/ span title;
   background-color: rgba(1,1,1,0.5);
 }
