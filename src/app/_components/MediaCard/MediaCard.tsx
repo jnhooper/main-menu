@@ -65,7 +65,11 @@ export const MediaCard = (props: MediaCard) => {
             <ExpandableTriggerButton>
               {isExpanded ? 'less' : 'more'} details
             </ExpandableTriggerButton>
-            <ExpandableContent preset="blur-md" stagger staggerChildren={0.2}>
+            <ExpandableContent
+              preset="slide-down"
+              stagger
+              staggerChildren={0.2}
+            >
               <p className="text-sm text-gray-700 dark:text-gray-200 mb-4">
                 Weekly design sync to discuss ongoing projects, share updates,
                 and address any design-related challenges.

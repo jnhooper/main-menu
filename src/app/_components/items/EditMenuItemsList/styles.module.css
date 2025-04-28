@@ -1,5 +1,5 @@
 .listWrapper {
-  display: grid;
+  /*display: grid;*/
 }
 
 .wrapper {
@@ -7,5 +7,5 @@
 }
 
 .ul {
-  @apply flex flex-col gap-8; 
+  @apply flex flex-row flex-wrap gap-y-5 place-content-center; 
 }

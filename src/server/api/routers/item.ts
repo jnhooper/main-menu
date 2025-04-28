@@ -1,4 +1,4 @@
-import {eq, and} from 'drizzle-orm'
+import {eq, and, sql} from 'drizzle-orm'
 import {z} from 'zod'
 
 import {
@@ -9,11 +9,37 @@ import {
 } from "~/server/api/trpc";
 import {
   apiCreateItem,
+  apiUpdateItem,
   apiCreateMovieItem,
   items,
 } from "~/server/db/schema";
 
 export const itemRouter = createTRPCRouter({
+
+
+  getEditItem: canEditMenu
+  .input(z.object({itemId: z.string()}))
+  .query(async ({ctx, input})=>{
+    const item = await ctx.db.query.items.findFirst({
+      where: eq(items.id, input.itemId)
+    })
+    return item
+  }),
+
+  updateItem: canEditMenu
+  .input(apiUpdateItem)
+  .input(z.object({itemId: z.string()}))
+  .mutation(async({ctx, input}) =>{
+    const { itemId, menuId, ...rest} = input;
+    const item = ctx.db.update(items).set({
+      ...rest,
+      updatedAt: sql`NOW()`
+    }).where(
+      eq(items.id, input.itemId)
+    ).returning()
+    return item
+  }),
+
   getVisibleMenuItems: isPrivateMenuProcedure
   .query(async ({ ctx, input }) => {
 

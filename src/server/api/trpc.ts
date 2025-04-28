@@ -236,6 +236,7 @@ export const canEditMenu = protectedProcedure
   }
 })
 
+
 export const headOfHousehold = protectedProcedure
 .input(z.object({ householdId: z.string() }))
 .use(timingMiddleware)

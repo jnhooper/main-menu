@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {type SelectMenu, type SelectItem} from '~/server/db/schema'
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
@@ -11,23 +11,55 @@ import {TimeDuration} from '../TimeDuration'
 
 interface CreateitemProps {
   menuId: SelectMenu['id']
-  onSubmit: (data?: SelectItem) => void
+  itemId?: SelectItem['id']
+  onSubmit?: (data?: SelectItem | SelectMenu) => void
 };
 export function CreateItem(props: CreateitemProps) {
   const {menuId, onSubmit} = props
+  const itemId = props.itemId!
+
+  const item =  api.item.getEditItem.useQuery(
+    { itemId, menuId },
+    { enabled: !!itemId }
+  )
+
+  useEffect(()=> {
+    if(item.data && !item.isLoading){
+      const metadata = item.data.metadata as Record<string, string | number>;
+      const trailer = metadata?.tailerHref as string
+      setName(item.data.name)
+      setDescription(item.data?.description ?? '')
+      setImgUrl(item.data.imageUrl)
+      setTrailerHref(trailer ?? undefined)
+      setRunTime(metadata?.runTime as number)
+
+    }
+  },[item.isLoading, item.data])
 
   const utils = api.useUtils();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState();
-  const [imageUrl, setImgUrl] = useState("");
-  const [trailerHref, setTrailerHref] = useState();
-  const [isVisible, setisVisible] = useState(true);
-  const [runTime, setRunTime] = useState();
+  const [name, setName] = useState<string | undefined>("");
+  const [description, setDescription] = useState<string | undefined>();
+  const [imageUrl, setImgUrl] = useState<string | undefined>("");
+  const [trailerHref, setTrailerHref] = useState<string | undefined>();
+  const [isVisible, setisVisible] = useState<boolean>(true);
+  const [runTime, setRunTime] = useState<number | undefined>();
+  const updateMovie = api.item.updateItem.useMutation({
+    onSuccess: async (data) => {
+      await utils.item.getVisibleMenuItems.invalidate({menuId})
+      await utils.item.getMenuItems.invalidate({menuId})
+      //onSubmit(data);
+      setName("");
+      setDescription(undefined)
+      setTrailerHref(undefined)
+      setImgUrl("")
+      setRunTime(undefined)
+    },
+  });
   const createMovie = api.item.createMovie.useMutation({
     onSuccess: async (data) => {
       await utils.item.getVisibleMenuItems.invalidate({menuId})
       await utils.item.getMenuItems.invalidate({menuId})
-      onSubmit(data);
+      //onSubmit(data);
       setName("");
       setDescription(undefined)
       setTrailerHref(undefined)
@@ -41,6 +73,20 @@ export function CreateItem(props: CreateitemProps) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          if(itemId){
+            updateMovie.mutate({
+              itemId,
+              menuId,
+              name,
+              description,
+              imageUrl: imageUrl,
+              isVisible,
+              metadata: {
+                runTime: runTime ?? undefined,
+                trailerHref: trailerHref ?? undefined
+              }
+            })
+          } else {
           createMovie.mutate({
             name,
             description,
@@ -52,6 +98,7 @@ export function CreateItem(props: CreateitemProps) {
               trailerHref: trailerHref ?? undefined
             }
           });
+          }
         }}
         className="flex flex-col gap-2"
       >

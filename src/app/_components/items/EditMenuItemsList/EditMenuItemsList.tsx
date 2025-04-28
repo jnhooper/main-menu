@@ -2,7 +2,7 @@
 
 import { api } from "~/trpc/react";
 import { type api as serverApi } from "~/trpc/server";
-import {MediaCard} from '~/app/_components/MediaCard'
+import {EditMediaCard} from '~/app/_components/EditMediaCard'
 import styles from './styles.module.css'
 
 
@@ -27,12 +27,12 @@ export function EditMenuItemsList(props: EditMenuItemsListProps) {
             menu.items.map((item)=>(
               <li
                 key={item.id}
-              className="mx-auto"
               >
-              <MediaCard
+              <EditMediaCard
                 title={item.name}
                 imgUrl={item.imageUrl}
-                description={item.description}
+                itemId={item.id}
+                menuId={menuId}
               />
               </li>
             ))

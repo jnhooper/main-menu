@@ -19,6 +19,7 @@ import {
 } from "motion/react"
 import useMeasure from "react-use-measure"
 
+import {Button, type ButtonProps} from '~/components/ui/button';
 import { cn } from "~/lib/utils"
 
 const springConfig = { stiffness: 200, damping: 20, bounce: 0.2 }
@@ -138,6 +139,8 @@ const Expandable = React.forwardRef<HTMLDivElement, ExpandableProps>(
     )
   }
 )
+
+Expandable.displayName = 'Expandable'
 
 // Simplify animation types
 type AnimationPreset = {
@@ -347,13 +350,14 @@ ExpandableContent.displayName ='ExpandableContent'
 interface ExpandableCardProps {
   children: ReactNode
   className?: string
-  collapsedSize?: { width?: number ; height?: number } // Size when collapsed
+  collapsedSize?: { width?:  number ; height?: number } // Size when collapsed
   expandedSize?: { width?: number ; height?: number  } // Size when expanded
   hoverToExpand?: boolean // Whether to expand on hover
   expandDelay?: number // Delay before expanding
   collapseDelay?: number // Delay before collapsing
   isFullWidth?: boolean
 }
+
 
 const ExpandableCard = React.forwardRef<HTMLDivElement, ExpandableCardProps>(
   (
@@ -377,9 +381,8 @@ const ExpandableCard = React.forwardRef<HTMLDivElement, ExpandableCardProps>(
     const [measureRef, { width, height }] = useMeasure()
 
     // Create motion values for width and height
-    const animatedWidth = useMotionValue(collapsedSize.width || 0)
-    const animatedHeight = useMotionValue(collapsedSize.height || 0)
-    console.log(collapsedSize, animatedHeight)
+    const animatedWidth = useMotionValue(collapsedSize.width ?? 0)
+    const animatedHeight = useMotionValue(collapsedSize.height ?? 0)
 
     // Apply spring animation to the motion values
     const smoothWidth = useSpring(animatedWidth, springConfig)
@@ -388,11 +391,11 @@ const ExpandableCard = React.forwardRef<HTMLDivElement, ExpandableCardProps>(
     // Effect to update the animated dimensions when expansion state changes
     useEffect(() => {
       if (isExpanded) {
-        animatedWidth.set(expandedSize.width || width)
-        animatedHeight.set(expandedSize.height || height)
+        animatedWidth.set(expandedSize.width ?? width)
+        animatedHeight.set(expandedSize.height ?? height)
       } else {
-        animatedWidth.set(collapsedSize.width || width)
-        animatedHeight.set(collapsedSize.height || height)
+        animatedWidth.set(collapsedSize.width ?? width)
+        animatedHeight.set(collapsedSize.height ?? height)
       }
     }, [
       isExpanded,
@@ -487,13 +490,18 @@ ExpandableTrigger.displayName = "ExpandableTrigger"
 
 const ExpandableTriggerButton = React.forwardRef<
   HTMLButtonElement,
-  React.HTMLAttributes<HTMLButtonElement>
+  ButtonProps
 >(({ children, ...props }, ref) => {
   const { toggleExpand } = useExpandable()
   return (
-    <button ref={ref} onClick={toggleExpand} className="cursor-pointer" {...props}>
+    <Button
+      ref={ref}
+      onClick={toggleExpand}
+      className="cursor-pointer"
+      {...props}
+    >
       {children}
-    </button>
+    </Button>
   )
 })
 

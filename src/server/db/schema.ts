@@ -136,6 +136,7 @@ export const apiMovieItem = createInsertSchema(items, {
 
 export const apiCreateItem = apiItem.omit(itemOmit)
 export type ApiCreateItem = z.infer<typeof apiCreateItem>
+export const apiUpdateItem = apiItem.omit(itemOmit).partial()
 
 export const apiCreateMovieItem = apiMovieItem.omit(itemOmit)
 export type ApiCreateMovieItem = z.infer<typeof apiCreateMovieItem>
