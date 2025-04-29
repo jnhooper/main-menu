@@ -14,7 +14,7 @@ import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 
 interface TimeDurationProps  {
-  value?: number
+  initialValue?: number
   onChange?: (value: {
     hours: number;
     minutes: number;
@@ -54,13 +54,13 @@ const secondsToHourMinSec = (secs: number): TimeObj => {
 }
 
 const hourMinSecondsToSeconds = (time: TimeObj): number => {
-  return time.hours*60 +time.mins*60 + time.seconds
+  return time.hours*60*60 +time.mins*60 + time.seconds
 }
 
 export function TimeDuration({
   className,
   showSeconds = false,
-  value = 0,
+  initialValue = 0,
   onChange,
   disabled = false,
   label = 'Duration',
@@ -70,7 +70,8 @@ export function TimeDuration({
     hours: valueHours,
     mins: valueMins,
     seconds: valueSeconds
-  } = secondsToHourMinSec(value)
+  } = secondsToHourMinSec(initialValue)
+
   const [hours, setHours] = useState<number>(valueHours)
   const [minutes, setMinutes] = useState<number>(valueMins)
   const [seconds, setSeconds] = useState<number>(valueSeconds)
@@ -80,12 +81,13 @@ export function TimeDuration({
   const secondsRef = useRef<HTMLInputElement>(null)
 
   // Update internal state when value prop changes
-  useEffect(() => {
-  const updatedTime = secondsToHourMinSec(value)
-    setHours(updatedTime.hours || 0)
-    setMinutes(updatedTime.mins || 0)
-    setSeconds(updatedTime.seconds || 0)
-  }, [value])
+  //useEffect(() => {
+  //  console.log('updated', initialValue)
+  //  const updatedTime = secondsToHourMinSec(initialValue)
+  //  setHours(updatedTime.hours || 0)
+  //  setMinutes(updatedTime.mins || 0)
+  //  setSeconds(updatedTime.seconds || 0)
+  //}, [initialValue])
 
   // Notify parent component when values change
   useEffect(() => {

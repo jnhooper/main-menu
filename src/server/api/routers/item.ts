@@ -1,4 +1,5 @@
 import {eq, and, sql} from 'drizzle-orm'
+import {TRPCError } from "@trpc/server";
 import {z} from 'zod'
 
 import {
@@ -23,7 +24,14 @@ export const itemRouter = createTRPCRouter({
     const item = await ctx.db.query.items.findFirst({
       where: eq(items.id, input.itemId)
     })
-    return item
+    if(item){
+      return item
+    } else{
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: 'item not found',
+    });
+    }
   }),
 
   updateItem: canEditMenu
@@ -31,6 +39,7 @@ export const itemRouter = createTRPCRouter({
   .input(z.object({itemId: z.string()}))
   .mutation(async({ctx, input}) =>{
     const { itemId, menuId, ...rest} = input;
+    console.log(rest)
     const item = ctx.db.update(items).set({
       ...rest,
       updatedAt: sql`NOW()`

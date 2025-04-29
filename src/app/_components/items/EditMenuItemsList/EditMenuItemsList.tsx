@@ -29,10 +29,7 @@ export function EditMenuItemsList(props: EditMenuItemsListProps) {
                 key={item.id}
               >
               <EditMediaCard
-                title={item.name}
-                imgUrl={item.imageUrl}
-                itemId={item.id}
-                menuId={menuId}
+                {...item} 
               />
               </li>
             ))

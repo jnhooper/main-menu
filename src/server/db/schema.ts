@@ -105,7 +105,7 @@ export const items = createTable('item', {
   description:text("description"),
   isVisible: boolean('is_visible'),
   menuId: varchar('menu_id').notNull(),
-  metadata: jsonb('metadata')
+  metadata: jsonb('metadata').$type<Record<string, string | number | boolean>>()
 })
 
 export const apiItem = createInsertSchema(items);
@@ -119,6 +119,7 @@ const itemOmit = {
   updatedById: true,
   lastSelected: true,
 } as const
+
 const movieMetadata = z.object({
     /**
      * runtime of the movie

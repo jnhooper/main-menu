@@ -11,16 +11,11 @@ import {
   ExpandableContent,
   ExpandableTriggerButton,
 } from "~/components/ui/expandable"
-import { CreateItem } from '~/app/_components/items/CreateItem'
+import { EditItem } from '~/app/_components/items/EditItem'
 import { Button } from '~/components/ui/button'
 import styles from './styles.module.css'
+import type {SelectItem} from '~/server/db/schema'
 
-interface EditMediaCardProps {
-  title: string
-  imgUrl:string
-  itemId: string
-  menuId: string
-}
 const useWindowSize = () => {
   const [size, setSize] = useState({
     width: window.innerWidth,
@@ -41,8 +36,12 @@ const useWindowSize = () => {
 
   return size;
 };
-export const EditMediaCard = (props: EditMediaCardProps) => {
-  const {title, imgUrl, itemId, menuId} = props
+export const EditMediaCard = (props: SelectItem) => {
+  const {
+    name,
+    imageUrl,
+    menuId,
+  } = props
   const windowSize = useWindowSize()
   const [ cardWidth, setCardWidth ] = useState(150);
   useEffect(()=>{
@@ -60,7 +59,7 @@ export const EditMediaCard = (props: EditMediaCardProps) => {
       initialDelay={0.2}
       className={styles.editMediaWrapper}
     >
-      {({ isExpanded }) => { 
+      {({ isExpanded, toggleExpand }) => { 
         return (
           <ExpandableCard
             isFullWidth
@@ -79,15 +78,15 @@ export const EditMediaCard = (props: EditMediaCardProps) => {
             <ExpandableCardHeader className={styles.expandableHeaderWrapper}>
               <div className={ styles.imageWrapper }>
                 <Image
-                  src={imgUrl}
+                  src={imageUrl}
                   width={200}
                   height={20}
                   className={styles.image}
-                  alt={`image for ${title}`}
+                  alt={`image for ${name}`}
                 />
                 <div className={styles.opacity}/>
                 <h2 className={styles.title}>
-                  {title}
+                  {name}
                 </h2>
               </div>
             </ExpandableCardHeader>
@@ -102,9 +101,10 @@ export const EditMediaCard = (props: EditMediaCardProps) => {
                 stagger
                 staggerChildren={0.2}
               >
-                <CreateItem
-                  itemId={itemId}
+                <EditItem
                   menuId={menuId}
+                  initialItem={props}
+                  onSuccess={toggleExpand}
                 />
               </ExpandableContent>
             </ExpandableCardContent>

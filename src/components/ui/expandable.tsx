@@ -53,7 +53,7 @@ const useExpandable = () => useContext(ExpandableContext)
 type ExpandablePropsBase = Omit<HTMLMotionProps<"div">, "children">
 
 interface ExpandableProps extends ExpandablePropsBase {
-  children: ReactNode | ((props: { isExpanded: boolean }) => ReactNode)
+  children: ReactNode | ((props: { isExpanded: boolean, toggleExpand: () => void }) => ReactNode)
   expanded?: boolean
   onToggle?: () => void
   transitionDuration?: number
@@ -133,7 +133,7 @@ const Expandable = React.forwardRef<HTMLDivElement, ExpandableProps>(
           {...props}
         >
           {/* Render children as a function if provided, otherwise render as is */}
-          {typeof children === "function" ? children({ isExpanded }) : children}
+          {typeof children === "function" ? children({ isExpanded,  toggleExpand}) : children}
         </motion.div>
       </ExpandableContext.Provider>
     )
