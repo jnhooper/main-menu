@@ -103,7 +103,7 @@ export const items = createTable('item', {
   imageUrl: text("image_url").notNull(),
   link: text("link"),
   description:text("description"),
-  isVisible: boolean('is_visible'),
+  isVisible: boolean('is_visible').default(true).notNull(),
   menuId: varchar('menu_id').notNull(),
   metadata: jsonb('metadata').$type<Record<string, string | number | boolean>>()
 })

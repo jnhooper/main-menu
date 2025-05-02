@@ -108,19 +108,6 @@ export const EditMediaCard = (props: SelectItem) => {
                 />
               </ExpandableContent>
             </ExpandableCardContent>
-            <ExpandableContent preset="slide-up">
-              <ExpandableCardFooter>
-                <div
-                  className={styles.footer}
-                >
-                  <Button
-                    variant='default'
-                  >
-                    save 
-                  </Button>
-                </div>
-              </ExpandableCardFooter>
-            </ExpandableContent>
           </ExpandableCard>
         ) }}
     </Expandable>

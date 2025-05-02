@@ -1,4 +1,4 @@
-import {eq, and, sql} from 'drizzle-orm'
+import {eq, and, sql, asc} from 'drizzle-orm'
 import {TRPCError } from "@trpc/server";
 import {z} from 'zod'
 
@@ -22,15 +22,15 @@ export const itemRouter = createTRPCRouter({
   .input(z.object({itemId: z.string()}))
   .query(async ({ctx, input})=>{
     const item = await ctx.db.query.items.findFirst({
-      where: eq(items.id, input.itemId)
+      where: eq(items.id, input.itemId),
     })
     if(item){
       return item
     } else{
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: 'item not found',
-    });
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: 'item not found',
+      });
     }
   }),
 
@@ -43,7 +43,8 @@ export const itemRouter = createTRPCRouter({
     const item = ctx.db.update(items).set({
       ...rest,
       updatedAt: sql`NOW()`
-    }).where(
+    })
+    .where(
       eq(items.id, input.itemId)
     ).returning()
     return item
@@ -69,7 +70,8 @@ export const itemRouter = createTRPCRouter({
     //todo create middleware like protected procedure that only lets
     //users from the household get info
     const menuItems = await ctx.db.query.items.findMany({
-      where: eq(items.menuId, input.menuId)
+      where: eq(items.menuId, input.menuId),
+      orderBy: (items, { asc }) => [asc(items.createdAt)],
     })
     return {
       ...ctx.menu,

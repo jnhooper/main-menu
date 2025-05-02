@@ -25,10 +25,12 @@ export const MovieForm = (props:MovieFormProps) => {
   const [name, setName] = useState<ApiCreateMovieItem['name']>(
     initialData?.name ?? ''
   );
+
   const [
     description,
     setDescription,
   ] = useState<string | undefined>(initialData?.description ?? "");
+
   const [imageUrl, setImgUrl] = useState<
     ApiCreateMovieItem['imageUrl']
   >(initialData?.imageUrl ?? '');
@@ -40,7 +42,7 @@ export const MovieForm = (props:MovieFormProps) => {
   const [
     isVisible,
     setisVisible,
-  ] = useState<boolean>(true);
+  ] = useState<SelectItem['isVisible']>(initialData ? initialData.isVisible : true);
 
   const [runTime, setRunTime] = useState<number | undefined>(
     initialData?.metadata?.runTime as number
@@ -126,7 +128,6 @@ export const MovieForm = (props:MovieFormProps) => {
             setRunTime(e.total)
           }}
         />
-        {runTime}
         < Button
           type="submit"
           variant='default'
