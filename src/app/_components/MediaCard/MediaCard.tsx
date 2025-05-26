@@ -11,15 +11,13 @@ import {
   ExpandableTriggerButton,
 } from "~/components/ui/expandable"
 import styles from './styles.module.css'
+import { type SelectMovieItem } from '~/server/db/schema';
+import {displayTime} from'../items/TimeDuration'
 
-interface MediaCard {
-  title: string
-  description?: string | null
-  href?: string
-  imgUrl:string
-}
-export const MediaCard = (props: MediaCard) => {
-  const {title, imgUrl} = props
+type MediaCardProps = Partial<SelectMovieItem>
+
+export const MediaCard = (props: MediaCardProps) => {
+  const { name, imageUrl, metadata} = props
   const cardWidth = 320;
   return (
     <Expandable
@@ -42,25 +40,29 @@ export const MediaCard = (props: MediaCard) => {
           <ExpandableCardHeader className={styles.expandableHeaderWrapper}>
             <div className={ styles.imageWrapper }>
               <Image
-                src={imgUrl}
+                src={imageUrl!}
                 width={270}
                 height={400}
                 className={styles.image}
-                alt={`image for ${title}`}
+                alt={`image for ${name}`}
               />
               <div className={styles.opacity}/>
               <h2 className={styles.title}>
-                {title}
+                {name}
               </h2>
             </div>
           </ExpandableCardHeader>
 
           <ExpandableCardContent>
+            {
+              metadata?.runTime ?
             <div className="flex flex-col items-start justify-between mb-4">
               <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                <span>1:30PM → 2:30PM</span>
+                <span>{displayTime(metadata.runTime)}</span>
               </div>
             </div>
+            :null
+            }
 
             <ExpandableTriggerButton>
               {isExpanded ? 'less' : 'more'} details

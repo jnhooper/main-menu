@@ -32,9 +32,10 @@ export function ItemList(props: MenuListProps) {
               className="mx-auto"
               >
               <MediaCard
-                title={item.name}
-                imgUrl={item.imageUrl}
+                name={item.name}
+                imageUrl={item.imageUrl}
                 description={item.description}
+                metadata={item.metadata ?? undefined}
               />
               </li>
             ))

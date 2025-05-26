@@ -5,7 +5,6 @@ import {z} from 'zod'
 import {
   createTRPCRouter,
   isPrivateMenuProcedure,
-  houseMemberProcedure,
   canEditMenu
 } from "~/server/api/trpc";
 import {
@@ -16,8 +15,6 @@ import {
 } from "~/server/db/schema";
 
 export const itemRouter = createTRPCRouter({
-
-
   getEditItem: canEditMenu
   .input(z.object({itemId: z.string()}))
   .query(async ({ctx, input})=>{

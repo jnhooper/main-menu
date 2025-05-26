@@ -11,7 +11,7 @@ import {
 
 import { cn } from "~/lib/utils"
 import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
+import {secondsToHourMinSec, hourMinSecondsToSeconds} from './utils'
 
 interface TimeDurationProps  {
   initialValue?: number
@@ -32,29 +32,6 @@ interface TimeDurationProps  {
    * defaults to false
    **/
   showSeconds?: boolean
-}
-
-interface TimeObj {
-  hours: number
-  mins: number
-  seconds: number
-}
-
-const secondsToHourMinSec = (secs: number): TimeObj => {
-  const [hours = 0, mins = 0, seconds = 0] = new Date(secs * 1000)
-  .toISOString()
-  .substring(11, 19).split(':').map(
-    num => parseInt(num)
-  )
-  return {
-    hours,
-    mins,
-    seconds
-  }
-}
-
-const hourMinSecondsToSeconds = (time: TimeObj): number => {
-  return time.hours*60*60 +time.mins*60 + time.seconds
 }
 
 export function TimeDuration({

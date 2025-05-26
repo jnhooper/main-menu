@@ -131,6 +131,10 @@ const movieMetadata = z.object({
     trailerHref: z.string().url().optional()
   })
 
+export type SelectMovieItem = SelectItem & {
+  metadata: z.infer<typeof movieMetadata>
+}
+
 export const apiMovieItem = createInsertSchema(items, {
   metadata: movieMetadata.optional()
 });
