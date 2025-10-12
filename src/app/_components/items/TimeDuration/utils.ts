@@ -18,11 +18,11 @@ export const secondsToHourMinSec = (secs: number): TimeObj => {
 }
 
 export const displayTime = (sec:number, showSeconds?: boolean)=>{
-	if(sec){
-		const {hours, mins, seconds} = secondsToHourMinSec(sec)
-		return `${hours}hr ${mins}mins`+ (showSeconds ? ` ${seconds} seconds` : '')
-	}
-	return ''
+  if(sec){
+    const {hours, mins, seconds} = secondsToHourMinSec(sec)
+    return `${hours}hr ${mins}mins`+ (showSeconds ? ` ${seconds} seconds` : '')
+  }
+  return ''
 }
 
 export const hourMinSecondsToSeconds = (time: TimeObj): number => {

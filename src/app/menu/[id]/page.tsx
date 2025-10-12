@@ -16,8 +16,13 @@ export default async function Page({
 
   return (
     <HydrateClient>
-        My menu: {menu?.name}
-        <ItemList initialItems={items}/>
+      <h2 className="text-xl p-4">
+        {menu?.name}
+      </h2>
+      <ItemList
+        initialItems={items}
+        menuId={id}
+      />
     </HydrateClient>
   );
 }
