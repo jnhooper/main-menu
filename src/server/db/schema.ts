@@ -163,7 +163,8 @@ export const households = createTable('household', {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }).notNull(),
-  headOfHouseholdId: varchar('head_of_household_id').notNull()
+  headOfHouseholdId: varchar('head_of_household_id').notNull(),
+  defaultMenuId: varchar('default_menu_id')
 })
 
 export type SelectHousehold = InferSelectModel<typeof households>

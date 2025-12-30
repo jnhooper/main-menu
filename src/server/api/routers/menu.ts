@@ -73,12 +73,22 @@ export const menusRouter = createTRPCRouter({
       createdById: ctx.session.user.id,
       lastUpdatedById: ctx.session.user.id
     }).returning();
+
     const menu = menuArr.pop()
     if(menu){
+      const household = await ctx.db.query.households.findFirst({
+        where: eq(households.id, input.householdId)
+      })                 
+      if(household && !household?.defaultMenuId === null){
+        await ctx.db.update(households)
+        .set({ defaultMenuId: menu.id })
+        .where(
+          eq(households.id, menu.householdId)
+        )
+      }
       return menu
     }
     else return []
-
   }),
 
 

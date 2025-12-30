@@ -49,6 +49,18 @@ export const householdsRouter = createTRPCRouter({
     )).returning()
   }),
 
+  setDefaultMenu: houseMemberProcedure
+  // TODO:how do i get the menu id type here from schema
+  .input(z.object({ menuId: z.string() }))
+  .mutation(async ({ctx, input})=>{
+    return await ctx.db.update(households).set({
+      defaultMenuId: input.menuId,
+    }).where(eq(
+      households.id,
+      input.householdId
+    )).returning()
+  }),
+
   getHousehold: protectedProcedure
   .input(z.object({id: z.string().min(1)}))
   .query(async ({ctx, input})=>{
