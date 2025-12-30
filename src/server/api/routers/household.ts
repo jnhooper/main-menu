@@ -39,6 +39,7 @@ export const householdsRouter = createTRPCRouter({
     }
   }),
 
+
   markAsDefault: houseMemberProcedure
   .mutation(async({ctx, input})=> {
     return await ctx.db.update(users).set({

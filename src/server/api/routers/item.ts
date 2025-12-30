@@ -42,7 +42,10 @@ export const itemRouter = createTRPCRouter({
       updatedAt: sql`NOW()`
     })
     .where(
-      eq(items.id, input.itemId)
+      eq(
+        items.id,
+        input.itemId
+      )
     ).returning()
     return item
   }),

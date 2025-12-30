@@ -21,7 +21,9 @@ export default function RootLayout({
     >
       <body>
         <div vaul-drawer-wrapper="" className="bg-background">
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <TRPCReactProvider>
+            {children}
+          </TRPCReactProvider>
         </div>
       </body>
     </html>
