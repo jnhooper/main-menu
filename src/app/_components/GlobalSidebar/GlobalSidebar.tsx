@@ -27,7 +27,7 @@ export function GlobalSidebar(props: GlobalSidebarProps) {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Households</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {myHouseholds.map((hh) => (
