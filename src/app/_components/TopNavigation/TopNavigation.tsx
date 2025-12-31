@@ -27,7 +27,7 @@ export const TopNavigation = async (props: TopNavigationProps) => {
                   asChild
                   className={navigationMenuTriggerStyle()}
                 >
-                  <Link href={`menu/${link.id}`}>{link.name}</Link>
+                  <Link href={`/menu/${link.id}`}>{link.name}</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             ))}
