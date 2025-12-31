@@ -39,7 +39,6 @@ export const householdsRouter = createTRPCRouter({
     }
   }),
 
-
   markAsDefault: houseMemberProcedure
   .mutation(async({ctx, input})=> {
     return await ctx.db.update(users).set({
@@ -54,6 +53,15 @@ export const householdsRouter = createTRPCRouter({
   // TODO:how do i get the menu id type here from schema
   .input(z.object({ menuId: z.string() }))
   .mutation(async ({ctx, input})=>{
+    // add the default menu id to the user
+    if(!ctx.session.user.defaultMenuId || (
+      ctx.session.user.defaultHouseholdId === input.householdId &&
+        ctx.session.user.defaultMenuId!== input.menuId
+    )){
+      await ctx.db.update(users).set({
+        defaultMenuId: input.menuId
+      }).where(eq(users.id, ctx.session.user.id))
+    }
     return await ctx.db.update(households).set({
       defaultMenuId: input.menuId,
     }).where(eq(

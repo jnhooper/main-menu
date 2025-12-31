@@ -24,6 +24,7 @@ declare module "next-auth" {
       // role: UserRole;
       //
       defaultHouseholdId?: string | null
+      defaultMenuId?: string | null
     } & DefaultSession["user"];
   }
 
