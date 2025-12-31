@@ -80,7 +80,7 @@ export const MediaCard = (props: MediaCardProps) => {
                     >
                       {description
                         ? (
-                          <p className="text-sm text-gray-700 dark:text-gray-200 mb-4 mt-4">
+                          <p className="text-sm text-gray-700 dark:text-gray-200 pt-4">
                             {description}
                           </p>
                         )
