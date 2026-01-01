@@ -1,5 +1,6 @@
 "use client";
 import { api, RouterOutputs } from "~/trpc/react";
+import { SignInButton } from "~/app/_components/SignInButton";
 
 import {
   Sidebar,
@@ -39,6 +40,16 @@ export function GlobalSidebar(props: GlobalSidebarProps) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+          <SidebarGroupLabel>User</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <SignInButton signedIn />
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
