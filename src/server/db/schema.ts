@@ -14,6 +14,7 @@ import {
   timestamp,
   varchar,
   jsonb,
+  unique,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { type AdapterAccount } from "next-auth/adapters";
@@ -69,8 +70,11 @@ export const menus = createTable('menu', {
   ),
   householdId: varchar('household_id', {length: 255}).notNull()
     .references(() => households.id, {onDelete: 'cascade'}),
-  isPrivate: boolean('is_private').default(false)
-})
+  isPrivate: boolean('is_private').default(false),
+  position: integer('position').notNull(),
+}, (t) => ({
+    unq: unique().on(t.householdId, t.position)
+  }));
 
 export type SelectMenu = InferSelectModel<typeof menus>
 export const selectMenuSchema = createSelectSchema(menus)
@@ -105,8 +109,11 @@ export const items = createTable('item', {
   description:text("description"),
   isVisible: boolean('is_visible').default(true).notNull(),
   menuId: varchar('menu_id').notNull(),
-  metadata: jsonb('metadata').$type<Record<string, string | number | boolean>>()
-})
+  metadata: jsonb('metadata').$type<Record<string, string | number | boolean>>(),
+  position: integer('position').notNull(),
+}, (t) => ({
+    unq: unique().on(t.menuId, t.position)
+  }));
 
 export const apiItem = createInsertSchema(items);
 export type SelectItem = InferSelectModel<typeof items>
