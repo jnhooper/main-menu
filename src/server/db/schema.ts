@@ -9,6 +9,7 @@ import {
   integer,
   pgTableCreator,
   pgTable,
+  pgEnum,
   primaryKey,
   text,
   timestamp,
@@ -52,6 +53,8 @@ export const posts = createTable(
 /**
  * a menu belongs to a household
   **/
+export const menuTypeEnumValues = ['media', 'food'] as const;
+export const menuTypeEnum = pgEnum('type', menuTypeEnumValues);
 export const menus = createTable('menu', {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -72,10 +75,11 @@ export const menus = createTable('menu', {
     .references(() => households.id, {onDelete: 'cascade'}),
   isPrivate: boolean('is_private').default(false),
   position: integer('position').notNull(),
+  type: menuTypeEnum('type').notNull(),
 }, (t) => ({
     unq: unique().on(t.householdId, t.position)
   }));
-
+export type MenuType = typeof menuTypeEnum.enumValues[number];
 export type SelectMenu = InferSelectModel<typeof menus>
 export const selectMenuSchema = createSelectSchema(menus)
 
@@ -87,6 +91,11 @@ export const menuRelations = relations(menus, ({one, many})=> ({
   items: many(items)
 }))
 
+/**
+ ********************
+ * Item schema
+ ********************
+ **/
 export const items = createTable('item', {
   id: varchar("id", { length: 255 })
     .notNull()
@@ -127,6 +136,15 @@ const itemOmit = {
   lastSelected: true,
 } as const
 
+export const apiCreateItem = apiItem.omit(itemOmit)
+export type ApiCreateItem = z.infer<typeof apiCreateItem>
+export const apiUpdateItem = apiItem.omit(itemOmit).partial()
+
+/**
+ ********************
+ * Movie Item schema
+ ********************
+ **/
 const movieMetadata = z.object({
     /**
      * runtime of the movie
@@ -146,13 +164,44 @@ export const apiMovieItem = createInsertSchema(items, {
   metadata: movieMetadata.optional()
 });
 
-export const apiCreateItem = apiItem.omit(itemOmit)
-export type ApiCreateItem = z.infer<typeof apiCreateItem>
-export const apiUpdateItem = apiItem.omit(itemOmit).partial()
 
 export const apiCreateMovieItem = apiMovieItem.omit(itemOmit)
 export type ApiCreateMovieItem = z.infer<typeof apiCreateMovieItem>
 
+
+/**
+ ********************
+ * Food Item schema
+ ********************
+ **/
+const foodMetadata = z.object({
+  /**
+   * ingredient list
+   * */
+  ingredients: z.array(
+    z.object({
+      amount: z.string().optional(),
+      ingredient: z.string()
+    })
+  ).optional(),
+  /**
+   * link to the recipe
+   **/
+  recipeLink: z.string().url().optional()
+
+})
+
+export type SelectFoodItem = SelectItem & {
+  metadata: z.infer<typeof foodMetadata>
+}
+
+export const apiFoodItem = createInsertSchema(items, {
+  metadata: foodMetadata.optional()
+});
+
+
+export const apiCreateFoodItem = apiFoodItem.omit(itemOmit)
+export type ApiCreateFoodItem = z.infer<typeof apiCreateFoodItem>
 
 export const itemRelations = relations(items, ({one}) => ({
   menu: one(menus, {
