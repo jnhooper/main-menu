@@ -2,19 +2,20 @@
 import { useState } from "react";
 
 import { api } from "~/trpc/react";
-import type {SelectHousehold} from '~/server/db/schema'
+import type { SelectHousehold } from "~/server/db/schema";
 
 interface CreateMenuProps {
-  householdId: SelectHousehold['id']
-};
+  householdId: SelectHousehold["id"];
+  defaultPosition: number;
+}
 
 export function CreateMenu(props: CreateMenuProps) {
-  const {householdId} = props
+  const { householdId, defaultPosition } = props;
   const utils = api.useUtils();
   const [name, setName] = useState("");
   const createMenu = api.menu.create.useMutation({
     onSuccess: async () => {
-      await utils.menu.getHouseholdMenus.invalidate({householdId});
+      await utils.menu.getHouseholdMenus.invalidate({ householdId });
       setName("");
     },
   });
@@ -24,7 +25,11 @@ export function CreateMenu(props: CreateMenuProps) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          createMenu.mutate({ name, householdId });
+          createMenu.mutate({
+            name,
+            householdId,
+            position: defaultPosition,
+          });
         }}
         className="flex flex-col gap-2"
       >

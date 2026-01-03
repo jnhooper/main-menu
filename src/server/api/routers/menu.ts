@@ -10,6 +10,7 @@ import {
 isPrivateMenuProcedure,
 } from "~/server/api/trpc";
 import {  menus, households } from "~/server/db/schema";
+import { insertAndReorder, removeAndReorder, updateAndReorder } from "./reorder";
 
 export const menusRouter = createTRPCRouter({
 
@@ -65,16 +66,26 @@ export const menusRouter = createTRPCRouter({
   create: houseMemberProcedure
   .input(z.object({
     name: z.string().min(1),
+    position: z.number().int().min(1)
   }))
   .mutation(async ({ ctx, input }) => {
-    const menuArr = await ctx.db.insert(menus).values({
-      name: input.name,
-      householdId: input.householdId,
-      createdById: ctx.session.user.id,
-      lastUpdatedById: ctx.session.user.id
-    }).returning();
+    const {  position, householdId, ...itemData } = input;
+    const userId = ctx.session.user.id;
 
-    const menu = menuArr.pop()
+    const menuArr = await insertAndReorder(
+      ctx.db,
+      menus,          // The table to insert into
+      menus.householdId,   // The parent ID column
+      householdId,         // The specific parent ID
+      position,    // The desired position
+      {               // The data for the new item
+        ...itemData,
+        createdById: userId,
+        householdId, // Ensure parent ID is in the data object
+      }
+    );
+
+    const menu = menuArr.pop() as typeof menus.$inferSelect
     if(menu){
       const household = await ctx.db.query.households.findFirst({
         where: eq(households.id, input.householdId)

@@ -1,6 +1,6 @@
 "use client";
-import {useState} from 'react'
-import {Button} from '~/components/ui/button'
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
 import {
   Credenza,
   CredenzaBody,
@@ -10,41 +10,45 @@ import {
   CredenzaFooter,
   CredenzaHeader,
   CredenzaTitle,
-} from "~/components/ui/credenza"
-import {type SelectMenu} from '~/server/db/schema'
+} from "~/components/ui/credenza";
+import { type SelectMenu } from "~/server/db/schema";
 import CreateItem from "~/app/_components/items/CreateItem";
 
 interface AddMovieProps {
-  menuId: SelectMenu['id']
-  menuName: SelectMenu['name']
+  menuId: SelectMenu["id"];
+  menuName: SelectMenu["name"];
   /**
-  * defaults to 'item'
-  * */
-  itemType?: string
+   * defaults to 'item'
+   */
+  itemType?: string;
+  defaultPosition: number;
 }
 
 export const AddMovie = (props: AddMovieProps) => {
   const {
-    itemType = 'item',
+    itemType = "item",
     menuId,
     menuName,
-  } = props
-  const [open, setOpen] = useState<boolean>(false)
+    defaultPosition,
+  } = props;
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleOpen = () => {
-    setOpen(true)
-  }
+    setOpen(true);
+  };
 
   const handleClose = () => {
-    setOpen(false)
-  }
+    setOpen(false);
+  };
 
   return (
-    <div className='sticky top-4 z-10 flex flex-row-reverse'>
+    <div className="sticky top-4 z-10 flex flex-row-reverse">
       <Button
         onClick={handleOpen}
         size="lg"
-      >{`Add ${itemType}`}</Button>
+      >
+        {`Add ${itemType}`}
+      </Button>
       <Credenza
         open={open}
         onOpenChange={setOpen}
@@ -60,6 +64,7 @@ export const AddMovie = (props: AddMovieProps) => {
             <CreateItem
               menuId={menuId}
               onSubmit={handleClose}
+              defaultPosition={defaultPosition}
             />
           </CredenzaBody>
           <CredenzaFooter>
@@ -70,5 +75,5 @@ export const AddMovie = (props: AddMovieProps) => {
         </CredenzaContent>
       </Credenza>
     </div>
-  )
-}
+  );
+};

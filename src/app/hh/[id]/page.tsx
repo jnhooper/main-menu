@@ -14,7 +14,10 @@ export default async function Page({
     <HydrateClient>
       <div>
         My household: {household?.name}
-        <CreateMenu householdId={id} />
+        <CreateMenu
+          householdId={id}
+          defaultPosition={menus.length + 1}
+        />
         <MenuList
           householdId={id}
           initialMenus={menus}

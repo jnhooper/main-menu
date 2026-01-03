@@ -13,10 +13,13 @@ import {
   apiCreateMovieItem,
   items,
 } from "~/server/db/schema";
+import { insertAndReorder, removeAndReorder, updateAndReorder } from "./reorder";
 
 export const itemRouter = createTRPCRouter({
   getEditItem: canEditMenu
-  .input(z.object({itemId: z.string()}))
+  .input(z.object({
+    itemId: z.string(),
+  }))
   .query(async ({ctx, input})=>{
     const item = await ctx.db.query.items.findFirst({
       where: eq(items.id, input.itemId),
@@ -34,21 +37,28 @@ export const itemRouter = createTRPCRouter({
   updateItem: canEditMenu
   .input(apiUpdateItem)
   .input(z.object({itemId: z.string()}))
-  .mutation(async({ctx, input}) =>{
-    const { itemId, menuId, ...rest} = input;
-    console.log(rest)
-    const item = ctx.db.update(items).set({
-      ...rest,
-      updatedAt: sql`NOW()`
-    })
-    .where(
-      eq(
-        items.id,
-        input.itemId
-      )
-    ).returning()
-    return item
+  .mutation(async({ctx, input}) => {
+ const { itemId:id, ...data } = input;
+
+      if (Object.keys(data).length === 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No data provided to update.",
+        });
+      }
+
+      // One call to our powerful, atomic utility function.
+      const updatedList = await updateAndReorder(
+        ctx.db,
+        items,
+        items.menuId,
+        id,
+        data
+      ) as typeof items.$inferSelect[];
+
+      return updatedList.pop();
   }),
+
 
   getVisibleMenuItems: isPrivateMenuProcedure
   .query(async ({ ctx, input }) => {
@@ -85,15 +95,21 @@ export const itemRouter = createTRPCRouter({
   .mutation(async ( {ctx, input} ) => {
 
     //TODO CHECK THAT MENU BELONGS TO HOUSEHOLD
-    const itemArr = await ctx.db.insert(items).values({
-      name: input.name,
-      description:input.description,
-      menuId: input.menuId,
-      link: input.link,
-      isVisible: input.isVisible,
-      imageUrl: input.imageUrl,
-      createdById: ctx.session.user.id
-    }).returning()
+    const {  position, menuId, ...itemData } = input;
+    const userId = ctx.session.user.id;
+    const itemArr = await insertAndReorder(
+      ctx.db,
+      items,          // The table to insert into
+      items.menuId,   // The parent ID column
+      menuId,         // The specific parent ID
+      position,    // The desired position
+      {               // The data for the new item
+        ...itemData,
+        createdById: userId,
+        menuId, // Ensure parent ID is in the data object
+      }
+    ) as typeof items.$inferSelect[];
+
    return itemArr.pop() 
 
   }),
@@ -103,16 +119,22 @@ export const itemRouter = createTRPCRouter({
   .mutation(async ( {ctx, input} ) => {
 
     //TODO CHECK THAT MENU BELONGS TO HOUSEHOLD
-    const itemArr = await ctx.db.insert(items).values({
-      name: input.name,
-      description:input.description,
-      menuId: input.menuId,
-      link: input.link,
-      isVisible: input.isVisible,
-      imageUrl: input.imageUrl,
-      createdById: ctx.session.user.id,
-      metadata: input.metadata
-    }).returning()
+    const {  position, menuId, ...itemData } = input;
+    const userId = ctx.session.user.id;
+    const itemArr = await insertAndReorder(
+      ctx.db,
+      items,          // The table to insert into
+      items.menuId,   // The parent ID column
+      menuId,         // The specific parent ID
+      position,    // The desired position
+      {               // The data for the new item
+        ...itemData,
+        createdById: userId,
+        menuId, // Ensure parent ID is in the data object
+      }
+    ) as typeof items.$inferSelect[];
+
+
    return itemArr.pop() 
 
   })

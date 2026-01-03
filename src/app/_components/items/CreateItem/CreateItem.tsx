@@ -1,40 +1,38 @@
 "use client";
-import { useState, useEffect } from "react";
-import {type SelectMenu, type SelectItem} from '~/server/db/schema'
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import {Switch} from "~/components/ui/switch"
+import { useEffect, useState } from "react";
+import { type SelectItem, type SelectMenu } from "~/server/db/schema";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Switch } from "~/components/ui/switch";
 import { api } from "~/trpc/react";
-import {TimeDuration} from '../TimeDuration'
-
-
+import { TimeDuration } from "../TimeDuration";
 
 interface CreateitemProps {
-  menuId: SelectMenu['id']
-  itemId?: SelectItem['id']
-  onSubmit?: (data?: SelectItem | SelectMenu) => void
-};
+  menuId: SelectMenu["id"];
+  itemId?: SelectItem["id"];
+  onSubmit?: (data?: SelectItem | SelectMenu) => void;
+  defaultPosition: number;
+}
 export function CreateItem(props: CreateitemProps) {
-  const {menuId, onSubmit} = props
-  const itemId = props.itemId!
+  const { menuId, onSubmit, defaultPosition } = props;
+  const itemId = props.itemId!;
 
-  const item =  api.item.getEditItem.useQuery(
+  const item = api.item.getEditItem.useQuery(
     { itemId, menuId },
-    { enabled: !!itemId }
-  )
+    { enabled: !!itemId },
+  );
 
-  useEffect(()=> {
-    if(item.data && !item.isLoading){
+  useEffect(() => {
+    if (item.data && !item.isLoading) {
       const metadata = item.data.metadata as Record<string, string | number>;
-      const trailer = metadata?.tailerHref as string
-      setName(item.data.name)
-      setDescription(item.data?.description ?? '')
-      setImgUrl(item.data.imageUrl)
-      setTrailerHref(trailer ?? undefined)
-      setRunTime(metadata?.runTime as number)
-
+      const trailer = metadata?.tailerHref as string;
+      setName(item.data.name);
+      setDescription(item.data?.description ?? "");
+      setImgUrl(item.data.imageUrl);
+      setTrailerHref(trailer ?? undefined);
+      setRunTime(metadata?.runTime as number);
     }
-  },[item.isLoading, item.data])
+  }, [item.isLoading, item.data]);
 
   const utils = api.useUtils();
   const [name, setName] = useState<string | undefined>("");
@@ -45,26 +43,26 @@ export function CreateItem(props: CreateitemProps) {
   const [runTime, setRunTime] = useState<number | undefined>();
   const updateMovie = api.item.updateItem.useMutation({
     onSuccess: async (data) => {
-      await utils.item.getVisibleMenuItems.invalidate({menuId})
-      await utils.item.getMenuItems.invalidate({menuId})
+      await utils.item.getVisibleMenuItems.invalidate({ menuId });
+      await utils.item.getMenuItems.invalidate({ menuId });
       //onSubmit(data);
       setName("");
-      setDescription(undefined)
-      setTrailerHref(undefined)
-      setImgUrl("")
-      setRunTime(undefined)
+      setDescription(undefined);
+      setTrailerHref(undefined);
+      setImgUrl("");
+      setRunTime(undefined);
     },
   });
   const createMovie = api.item.createMovie.useMutation({
     onSuccess: async (data) => {
-      await utils.item.getVisibleMenuItems.invalidate({menuId})
-      await utils.item.getMenuItems.invalidate({menuId})
+      await utils.item.getVisibleMenuItems.invalidate({ menuId });
+      await utils.item.getMenuItems.invalidate({ menuId });
       //onSubmit(data);
       setName("");
-      setDescription(undefined)
-      setTrailerHref(undefined)
-      setImgUrl("")
-      setRunTime(undefined)
+      setDescription(undefined);
+      setTrailerHref(undefined);
+      setImgUrl("");
+      setRunTime(undefined);
     },
   });
 
@@ -73,7 +71,7 @@ export function CreateItem(props: CreateitemProps) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if(itemId){
+          if (itemId) {
             updateMovie.mutate({
               itemId,
               menuId,
@@ -83,21 +81,22 @@ export function CreateItem(props: CreateitemProps) {
               isVisible,
               metadata: {
                 runTime: runTime ?? undefined,
-                trailerHref: trailerHref ?? undefined
-              }
-            })
+                trailerHref: trailerHref ?? undefined,
+              },
+            });
           } else {
-          createMovie.mutate({
-            name,
-            description,
-            imageUrl: imageUrl,
-            isVisible,
-            menuId,
-            metadata: {
-              runTime: runTime ?? undefined,
-              trailerHref: trailerHref ?? undefined
-            }
-          });
+            createMovie.mutate({
+              name,
+              description,
+              imageUrl: imageUrl,
+              position: defaultPosition,
+              isVisible,
+              menuId,
+              metadata: {
+                runTime: runTime ?? undefined,
+                trailerHref: trailerHref ?? undefined,
+              },
+            });
           }
         }}
         className="flex flex-col gap-2"
@@ -142,7 +141,7 @@ export function CreateItem(props: CreateitemProps) {
           id="visibleSwitch"
           checked={isVisible}
           onCheckedChange={() => {
-            setisVisible(!isVisible)
+            setisVisible(!isVisible);
           }}
         />
         <Label htmlFor="movieTrailer">
@@ -157,8 +156,8 @@ export function CreateItem(props: CreateitemProps) {
           className="w-full rounded-full px-4 py-2 text-black"
         />
         <TimeDuration
-          onChange={(e)=> {
-            setRunTime(e.total)
+          onChange={(e) => {
+            setRunTime(e.total);
           }}
         />
         <button
