@@ -16,7 +16,7 @@ export default async function Page({
 
   return (
     <div>
-      <h2 className="text-xl p-4">
+      <h2 className="text-4xl p-4 pl-10 font-extrabold">
         {menu?.name}
       </h2>
       <ItemList

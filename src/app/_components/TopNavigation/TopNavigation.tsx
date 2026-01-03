@@ -10,10 +10,12 @@ import {
 
 interface TopNavigationProps {
   householdId: string;
+  currentMenuId: string;
 }
 export const TopNavigation = async (props: TopNavigationProps) => {
+  const { householdId, currentMenuId } = props;
   const myMenus = await api.menu.getHouseholdMenus({
-    householdId: props.householdId,
+    householdId: householdId,
   });
 
   return (
@@ -27,7 +29,14 @@ export const TopNavigation = async (props: TopNavigationProps) => {
                   asChild
                   className={navigationMenuTriggerStyle()}
                 >
-                  <Link href={`/menu/${link.id}`}>{link.name}</Link>
+                  <Link
+                    className={currentMenuId === link.id
+                      ? "underline underline-offset-2 font-bold"
+                      : ""}
+                    href={`/menu/${link.id}`}
+                  >
+                    {link.name}
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             ))}
