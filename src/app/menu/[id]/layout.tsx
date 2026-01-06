@@ -20,7 +20,9 @@ export default async function MyMenuLayout({
     <HydrateClient>
       {session?.user
         ? (
-          <SidebarProvider>
+          <SidebarProvider
+            defaultOpen={false}
+          >
             <GlobalSidebar
               initialHouseholds={households}
               currentHousehold={menu.householdId}
