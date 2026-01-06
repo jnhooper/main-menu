@@ -217,11 +217,10 @@ export const canEditMenu = protectedProcedure
       usersToHouseholds,
       and(
         eq(menus.householdId, usersToHouseholds.householdId),
-        eq(usersToHouseholds.userId, opts.ctx.session.user.id)
+        eq(usersToHouseholds.userId, opts.ctx.session.user.id),
       )
     )
-
-  const menu = result[0]?.menu
+  const menu = result.find(menu=> menu.menu.id=== opts.input.menuId)?.menu
   if(!menu){
     throw new TRPCError({
       code: "UNAUTHORIZED",
