@@ -11,20 +11,20 @@ import {
   CredenzaHeader,
   CredenzaTitle,
 } from "~/components/ui/credenza";
-import { type SelectMenu } from "~/server/db/schema";
+import type { MenuType, SelectMenu } from "~/server/db/schema";
 import CreateItem from "~/app/_components/items/CreateItem";
 
-interface AddMovieProps {
+interface AddItemProps {
   menuId: SelectMenu["id"];
   menuName: SelectMenu["name"];
   /**
    * defaults to 'item'
    */
-  itemType?: string;
+  itemType?: MenuType;
   defaultPosition: number;
 }
 
-export const AddMovie = (props: AddMovieProps) => {
+export const AddItem = (props: AddItemProps) => {
   const {
     itemType = "item",
     menuId,

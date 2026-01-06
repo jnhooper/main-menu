@@ -1,5 +1,5 @@
 import { api, HydrateClient } from "~/trpc/server";
-import { AddMovie } from "./AddMovie";
+import { AddItem } from "./AddItem";
 import EditMenuItemsList from "~/app/_components/items/EditMenuItemsList";
 
 export default async function Page({
@@ -18,10 +18,11 @@ export default async function Page({
         <h2 className="text-3xl place-content-center w-full inline-flex">
           {menu.name}
         </h2>
-        <AddMovie
+        <AddItem
           menuId={id}
           menuName={menu.name}
           defaultPosition={menu.items.length + 1}
+          itemType={menu.type}
         />
         <EditMenuItemsList
           initialData={menu}
