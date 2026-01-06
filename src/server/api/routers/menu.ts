@@ -9,7 +9,7 @@ import {
   protectedProcedure,
 isPrivateMenuProcedure,
 } from "~/server/api/trpc";
-import {  menus, households } from "~/server/db/schema";
+import {  menus, households, menuTypeEnumValues } from "~/server/db/schema";
 import { insertAndReorder, removeAndReorder, updateAndReorder } from "./reorder";
 
 export const menusRouter = createTRPCRouter({
@@ -66,7 +66,8 @@ export const menusRouter = createTRPCRouter({
   create: houseMemberProcedure
   .input(z.object({
     name: z.string().min(1),
-    position: z.number().int().min(1)
+    position: z.number().int().min(1),
+    type: z.enum(menuTypeEnumValues)
   }))
   .mutation(async ({ ctx, input }) => {
     const {  position, householdId, ...itemData } = input;

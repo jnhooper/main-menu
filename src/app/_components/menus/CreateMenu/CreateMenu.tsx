@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 import { api } from "~/trpc/react";
-import type { SelectHousehold } from "~/server/db/schema";
+import type { MenuType, SelectHousehold } from "~/server/db/schema";
 
 interface CreateMenuProps {
   householdId: SelectHousehold["id"];
@@ -13,6 +13,7 @@ export function CreateMenu(props: CreateMenuProps) {
   const { householdId, defaultPosition } = props;
   const utils = api.useUtils();
   const [name, setName] = useState("");
+  const [menuType, setMenuType] = useState<MenuType>("media");
   const createMenu = api.menu.create.useMutation({
     onSuccess: async () => {
       await utils.menu.getHouseholdMenus.invalidate({ householdId });
@@ -29,6 +30,7 @@ export function CreateMenu(props: CreateMenuProps) {
             name,
             householdId,
             position: defaultPosition,
+            type: menuType,
           });
         }}
         className="flex flex-col gap-2"
@@ -40,6 +42,17 @@ export function CreateMenu(props: CreateMenuProps) {
           onChange={(e) => setName(e.target.value)}
           className="w-full rounded-full px-4 py-2 text-black"
         />
+        <label className="flex flex-row gap-2">
+          Menu Type
+          <select
+            name="menu_type"
+            onChange={(e) => setMenuType(e.target.value as MenuType)}
+            id="menu-type"
+          >
+            <option value="media">media</option>
+            <option value="food">food</option>
+          </select>
+        </label>
         <button
           type="submit"
           className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
