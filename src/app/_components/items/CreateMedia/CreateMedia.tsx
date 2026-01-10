@@ -7,13 +7,13 @@ import { Switch } from "~/components/ui/switch";
 import { api } from "~/trpc/react";
 import { TimeDuration } from "../TimeDuration";
 
-interface CreateitemProps {
+interface CreateMediaProps {
   menuId: SelectMenu["id"];
   itemId?: SelectItem["id"];
   onSubmit?: (data?: SelectItem | SelectMenu) => void;
   defaultPosition: number;
 }
-export function CreateItem(props: CreateitemProps) {
+export function CreateMedia(props: CreateMediaProps) {
   const { menuId, onSubmit, defaultPosition } = props;
   const itemId = props.itemId!;
 

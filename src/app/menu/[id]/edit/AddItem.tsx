@@ -12,7 +12,8 @@ import {
   CredenzaTitle,
 } from "~/components/ui/credenza";
 import type { MenuType, SelectMenu } from "~/server/db/schema";
-import CreateItem from "~/app/_components/items/CreateItem";
+import CreateMedia from "~/app/_components/items/CreateMedia";
+import CreateFoodItem from "~/app/_components/items/CreateFoodItem";
 
 interface AddItemProps {
   menuId: SelectMenu["id"];
@@ -61,11 +62,21 @@ export const AddItem = (props: AddItemProps) => {
             </CredenzaDescription>
           </CredenzaHeader>
           <CredenzaBody>
-            <CreateItem
-              menuId={menuId}
-              onSubmit={handleClose}
-              defaultPosition={defaultPosition}
-            />
+            {itemType === "media"
+              ? (
+                <CreateMedia
+                  menuId={menuId}
+                  onSubmit={handleClose}
+                  defaultPosition={defaultPosition}
+                />
+              )
+              : (
+                <CreateFoodItem
+                  menuId={menuId}
+                  onSubmit={handleClose}
+                  defaultPosition={defaultPosition}
+                />
+              )}
           </CredenzaBody>
           <CredenzaFooter>
             <CredenzaClose asChild>

@@ -12,6 +12,7 @@ import {
   apiUpdateItem,
   apiCreateMovieItem,
   items,
+  apiCreateFoodItem,
 } from "~/server/db/schema";
 import { insertAndReorder, removeAndReorder, updateAndReorder } from "./reorder";
 
@@ -116,6 +117,30 @@ export const itemRouter = createTRPCRouter({
   
   createMovie: isPrivateMenuProcedure.
   input(apiCreateMovieItem)
+  .mutation(async ( {ctx, input} ) => {
+
+    //TODO CHECK THAT MENU BELONGS TO HOUSEHOLD
+    const {  position, menuId, ...itemData } = input;
+    const userId = ctx.session.user.id;
+    const itemArr = await insertAndReorder(
+      ctx.db,
+      items,          // The table to insert into
+      items.menuId,   // The parent ID column
+      menuId,         // The specific parent ID
+      position,    // The desired position
+      {               // The data for the new item
+        ...itemData,
+        createdById: userId,
+        menuId, // Ensure parent ID is in the data object
+      }
+    ) as typeof items.$inferSelect[];
+
+
+   return itemArr.pop() 
+
+  }),
+  createFoodItem: isPrivateMenuProcedure.
+  input(apiCreateFoodItem)
   .mutation(async ( {ctx, input} ) => {
 
     //TODO CHECK THAT MENU BELONGS TO HOUSEHOLD
