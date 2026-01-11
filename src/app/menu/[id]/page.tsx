@@ -22,6 +22,7 @@ export default async function Page({
       <ItemList
         initialItems={items}
         menuId={id}
+        menuType={menu.type}
       />
     </div>
   );
