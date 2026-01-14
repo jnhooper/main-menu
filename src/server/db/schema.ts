@@ -118,7 +118,10 @@ export const items = createTable('item', {
   description:text("description"),
   isVisible: boolean('is_visible').default(true).notNull(),
   menuId: varchar('menu_id').notNull(),
-  metadata: jsonb('metadata').$type<Record<string, string | number | boolean>>(),
+  metadata: jsonb('metadata').$type<Record<
+    string,
+    string | number | boolean | Array<Record<string,unknown> >
+  >>(),
   position: integer('position').notNull(),
 }, (t) => ({
     unq: unique().on(t.menuId, t.position)

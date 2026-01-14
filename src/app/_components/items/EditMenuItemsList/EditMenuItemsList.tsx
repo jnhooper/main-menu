@@ -1,40 +1,38 @@
-"use client"
+"use client";
 
 import { api } from "~/trpc/react";
 import { type api as serverApi } from "~/trpc/server";
-import {EditMediaCard} from '~/app/_components/EditMediaCard'
-import styles from './styles.module.css'
-
+import { EditMediaCard } from "~/app/_components/EditMediaCard";
+import EditFoodCard from "../../EditFoodCard";
+import styles from "./styles.module.css";
 
 interface EditMenuItemsListProps {
-  initialData:  Awaited<ReturnType<
-    (typeof serverApi)['item']['getMenuItems']
-  >>
+  initialData: Awaited<
+    ReturnType<
+      (typeof serverApi)["item"]["getMenuItems"]
+    >
+  >;
 }
 
 export function EditMenuItemsList(props: EditMenuItemsListProps) {
-  const { initialData} = props
-  const menuId = initialData.id
+  const { initialData } = props;
+  const menuId = initialData.id;
   const [menu] = api.item.getMenuItems.useSuspenseQuery(
-    {menuId},
-    {initialData}
+    { menuId },
+    { initialData },
   );
 
   return (
     <div className={styles.wrapper}>
-        <ul className={styles.ul}>
-          {
-            menu.items.map((item)=>(
-              <li
-                key={item.id}
-              >
-              <EditMediaCard
-                {...item} 
-              />
-              </li>
-            ))
-          }
-        </ul>
+      <ul className={styles.ul}>
+        {menu.items.map((item) => (
+          <li key={item.id}>
+            {menu.type === "food"
+              ? <EditFoodCard {...item} />
+              : <EditMediaCard {...item} />}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

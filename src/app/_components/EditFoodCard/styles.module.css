@@ -1,0 +1,44 @@
+
+.editMediaWrapper{
+  --edit-media-header-height: 200px;
+  --edit-media-footer-height: 70px;
+}
+.expandableHeaderWrapper{
+  @apply p-0;
+  & > *{
+    width: 100%;
+  }
+}
+
+.imageWrapper {
+  display: grid;
+  grid-template-areas: 
+    "image"
+    "title";
+  grid-template-rows: 1fr auto;
+
+  @apply w-[100%] h-[var(--edit-media-header-height)];
+}
+
+.image {
+  @apply object-cover w-[100%] h-[100%] rounded-lg sm:rounded-xl md:rounded-[2rem];
+  grid-area: 1/1/ span title;
+  background-color: rgba(1,1,1,0.5);
+}
+
+.opacity {
+  grid-area: image;
+  background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.5));
+}
+.title {
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,1));
+  grid-template-areas: subgrid;
+  grid-area: title;
+  @apply text-xl p-4;
+  color: white;
+}
+
+.footer {
+  height: var(--edit-media-footer-height)
+}
+
