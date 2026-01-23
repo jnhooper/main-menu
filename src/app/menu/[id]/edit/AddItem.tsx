@@ -43,7 +43,7 @@ export const AddItem = (props: AddItemProps) => {
   };
 
   return (
-    <div className="sticky top-4 z-10 flex flex-row-reverse">
+    <div className="sticky top-4 flex flex-row-reverse">
       <Button
         onClick={handleOpen}
         size="lg"

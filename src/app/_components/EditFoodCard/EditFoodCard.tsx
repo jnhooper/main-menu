@@ -62,6 +62,7 @@ export const EditFoodCard = (props: SelectFoodItem) => {
 
   const cardRef = useRef(null);
   const expandedDelay = 100;
+
   return (
     <Expandable
       expandDirection="both"
@@ -82,59 +83,76 @@ export const EditFoodCard = (props: SelectFoodItem) => {
           },
         });
         return (
-          <ExpandableCard
-            isFullWidth
-            className="w-full relative"
-            collapsedSize={{
-              width: cardWidth,
-            }}
-            expandedSize={{
-              width: windowSize.width,
-            }}
-            ref={cardRef}
-            hoverToExpand={false}
-            expandDelay={expandedDelay}
-            collapseDelay={500}
-          >
-            <ExpandableCardHeader className={styles.expandableHeaderWrapper}>
-              <div className={styles.imageWrapper}>
-                <Image
-                  src={imageUrl}
-                  width={200}
-                  height={20}
-                  className={styles.image}
-                  alt={`image for ${name}`}
+          <div>
+            {isExpanded
+              ? (
+                <div
+                  onClick={toggleExpand}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 1,
+                  }}
                 />
-                <div className={styles.opacity} />
-                <h2 className={styles.title}>
-                  {name}
-                </h2>
-              </div>
-            </ExpandableCardHeader>
-            <ExpandableCardContent>
-              <ExpandableTriggerButton
-                variant={"secondary"}
-              >
-                {isExpanded ? "Close" : "Edit Item"}
-              </ExpandableTriggerButton>
-              <ExpandableContent
-                preset="blur-md"
-                stagger
-                staggerChildren={0.2}
-              >
-                <FoodForm
-                  onSubmit={(data) =>
-                    updateFood.mutate({
-                      itemId: item[0].id,
-                      ...data,
-                    })}
-                  menuId={menuId}
-                  initialData={item[0]}
-                  mutationIsPending={updateFood.isPending}
-                />
-              </ExpandableContent>
-            </ExpandableCardContent>
-          </ExpandableCard>
+              )
+              : null}
+            <ExpandableCard
+              isFullWidth
+              className="w-full relative"
+              collapsedSize={{
+                width: cardWidth,
+              }}
+              expandedSize={{
+                width: windowSize.width,
+              }}
+              ref={cardRef}
+              hoverToExpand={false}
+              expandDelay={expandedDelay}
+              collapseDelay={500}
+            >
+              <ExpandableCardHeader className={styles.expandableHeaderWrapper}>
+                <div className={styles.imageWrapper}>
+                  <Image
+                    src={imageUrl}
+                    width={200}
+                    height={20}
+                    className={styles.image}
+                    alt={`image for ${name}`}
+                  />
+                  <div className={styles.opacity} />
+                  <h2 className={styles.title}>
+                    {name}
+                  </h2>
+                </div>
+              </ExpandableCardHeader>
+              <ExpandableCardContent>
+                <ExpandableTriggerButton
+                  variant={"secondary"}
+                >
+                  {isExpanded ? "Close" : "Edit Item"}
+                </ExpandableTriggerButton>
+                <ExpandableContent
+                  preset="blur-md"
+                  stagger
+                  staggerChildren={0.2}
+                >
+                  <FoodForm
+                    onSubmit={(data) =>
+                      updateFood.mutate({
+                        itemId: item[0].id,
+                        ...data,
+                      })}
+                    menuId={menuId}
+                    initialData={item[0]}
+                    mutationIsPending={updateFood.isPending}
+                  />
+                </ExpandableContent>
+              </ExpandableCardContent>
+            </ExpandableCard>
+          </div>
         );
       }}
     </Expandable>

@@ -27,7 +27,7 @@ export default async function MyMenuLayout({
               initialHouseholds={households}
               currentHousehold={menu.householdId}
             />
-            <div className="w-full mt-4 ml-2 mr-2">
+            <div className="w-full mt-4">
               <div className="flex flex-row place-items-center">
                 <SidebarTrigger />
                 <TopNavigation
